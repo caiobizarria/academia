@@ -1,1321 +1,940 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FitPulse Pro - Treino, Nutrição & Guia Visual</title>
-
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>IronTracker — Treino, Cargas & Guia Visual</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome 6 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Fonts: Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              push: '#f43f5e',
-              pull: '#0284c7',
-              legs: '#10b981',
-              dark: '#0a0e17',
-              card: '#111827',
-              border: '#1f293d'
-            }
-          }
-        }
-      }
-    }
-  </script>
-
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     body {
-      background-color: #080c14;
-      color: #f1f5f9;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-    .custom-scroll::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 9999px;
-    }
-    .active-nav-btn {
-      color: #38bdf8 !important;
-      font-weight: 700;
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
   </style>
 </head>
-<body class="min-h-screen pb-24 text-slate-100 antialiased selection:bg-cyan-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-28 select-none">
 
-  <header class="sticky top-0 z-40 bg-[#0c121e]/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
-    <div class="max-w-lg mx-auto flex items-center justify-between gap-3">
+  <!-- HEADER COMPACTO -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+    <div class="max-w-2xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center font-extrabold text-white text-base shadow-lg shadow-cyan-500/20">
-          FP
+        <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+          <i class="fa-solid fa-dumbbell text-lg"></i>
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-base font-extrabold text-white tracking-tight leading-tight">FitPulse Pro</h1>
-            <span class="text-[9px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded border border-emerald-500/30">78kg • 1,86m</span>
-          </div>
-          <p class="text-[11px] font-medium text-slate-400">Hipertrofia Modular + Corrida/Basquete</p>
+          <h1 class="text-base font-bold text-white leading-tight">IronTracker</h1>
+          <p class="text-[11px] text-slate-400">Memória de Cargas & Guia Visual</p>
         </div>
       </div>
-
-      <!-- Live kcal badge -->
-      <div class="flex items-center gap-1 bg-slate-900 border border-slate-700/80 rounded-full px-3 py-1 text-xs">
-        <i class="fa-solid fa-fire text-amber-400"></i>
-        <span class="font-bold text-slate-200">3.000 kcal</span>
-      </div>
+      <button onclick="openNewExerciseModal()" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-blue-600/20 active:scale-95 transition">
+        <i class="fa-solid fa-plus"></i>
+        <span>Novo Exercício</span>
+      </button>
     </div>
   </header>
 
-  <main class="max-w-lg mx-auto px-4 pt-4 space-y-4">
+  <!-- ABAS PRINCIPAIS -->
+  <main class="max-w-2xl mx-auto px-4 pt-4">
 
-    <!-- ========================================== -->
-    <!-- TAB 1: WORKOUTS (TREINOS P/P/L) -->
-    <!-- ========================================== -->
-    <section id="tab-workouts" class="space-y-4">
-
-      <!-- Routine Switcher Header -->
-      <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
-        <div class="flex justify-between items-start mb-2">
-          <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-widest text-cyan-400">Divisão Semanal Modular</span>
-            <h2 class="text-lg font-black text-white">Escolha o Treino de Hoje</h2>
-          </div>
-          <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-lg border border-slate-700 font-semibold">
-            3 a 6x/sem
-          </span>
-        </div>
-        <p class="text-xs text-slate-300 mb-3">
-          Toque em qualquer exercício para abrir a visualização anatômica completa ou trocar a foto por uma sua.
-        </p>
-
-        <!-- Selector buttons -->
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="setWorkout('push')" id="btn-push" class="flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-rose-500/50 bg-rose-950/40 text-rose-400 font-bold text-xs transition active:scale-95 shadow-lg shadow-rose-950/20">
-            <i class="fa-solid fa-dumbbell mb-1 text-sm"></i>
-            <span>Treino A</span>
-            <span class="text-[10px] font-normal opacity-80">Push (5)</span>
-          </button>
-          <button onclick="setWorkout('pull')" id="btn-pull" class="flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-semibold text-xs transition active:scale-95">
-            <i class="fa-solid fa-hand-back-fist mb-1 text-sm"></i>
-            <span>Treino B</span>
-            <span class="text-[10px] font-normal opacity-80">Pull (4)</span>
-          </button>
-          <button onclick="setWorkout('legs')" id="btn-legs" class="flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-semibold text-xs transition active:scale-95">
-            <i class="fa-solid fa-shoe-prints mb-1 text-sm"></i>
-            <span>Treino C</span>
-            <span class="text-[10px] font-normal opacity-80">Legs (5)</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Quick Action: Running & Basketball advice -->
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="openInfoModal('corrida')" class="bg-slate-900 border border-slate-800 hover:border-amber-500/40 p-2.5 rounded-xl flex items-center gap-2.5 text-left transition active:scale-95">
-          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
-            <i class="fa-solid fa-person-running"></i>
-          </div>
-          <div>
-            <div class="text-xs font-bold text-white">Corrida Z2</div>
-            <div class="text-[10px] text-slate-400">Cardio sem queimar massa</div>
-          </div>
+    <!-- VIEW: TREINO ATUAL -->
+    <section id="view-treino" class="space-y-4">
+      
+      <!-- SELETOR DE DIVISÃO (PUSH / PULL / LEGS / TODOS) -->
+      <div class="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+        <button onclick="switchCategory('push')" id="cat-push" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-md shadow-blue-600/25 transition">
+          Treino A (Push)
         </button>
-        <button onclick="openInfoModal('basquete')" class="bg-slate-900 border border-slate-800 hover:border-orange-500/40 p-2.5 rounded-xl flex items-center gap-2.5 text-left transition active:scale-95">
-          <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
-            <i class="fa-solid fa-basketball"></i>
-          </div>
-          <div>
-            <div class="text-xs font-bold text-white">Basquete</div>
-            <div class="text-[10px] text-slate-400">Gestão de pernas</div>
-          </div>
+        <button onclick="switchCategory('pull')" id="cat-pull" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition">
+          Treino B (Pull)
+        </button>
+        <button onclick="switchCategory('legs')" id="cat-legs" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition">
+          Treino C (Legs)
+        </button>
+        <button onclick="switchCategory('outros')" id="cat-outros" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition">
+          Funcional / Core
+        </button>
+        <button onclick="switchCategory('todos')" id="cat-todos" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition">
+          Todos (<span id="total-count">0</span>)
         </button>
       </div>
 
-      <!-- Rest stopwatch timer -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-center justify-between shadow-inner">
+      <!-- CRONÔMETRO DE DESCANSO COMPACTO -->
+      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl flex items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-stopwatch"></i>
-          </div>
+          <i class="fa-regular fa-clock text-blue-400 text-sm"></i>
           <div>
-            <span class="text-[10px] uppercase font-bold text-slate-400 block -mb-0.5">Descanso Entre Séries</span>
-            <span id="timer-text" class="font-mono text-base font-black text-cyan-300">00:00</span>
+            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cronômetro de Descanso</div>
+            <div id="timer-display" class="text-sm font-extrabold text-white font-mono">00:00</div>
           </div>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button onclick="startRest(60)" class="text-xs bg-slate-800 hover:bg-cyan-600 px-2.5 py-1.5 rounded-lg text-slate-200 font-semibold transition active:scale-95">60s</button>
-          <button onclick="startRest(90)" class="text-xs bg-slate-800 hover:bg-cyan-600 px-2.5 py-1.5 rounded-lg text-slate-200 font-semibold transition active:scale-95">90s</button>
-          <button onclick="startRest(120)" class="text-xs bg-slate-800 hover:bg-cyan-600 px-2.5 py-1.5 rounded-lg text-slate-200 font-semibold transition active:scale-95">120s</button>
-          <button onclick="stopRest()" class="text-xs text-rose-400 hover:text-rose-300 p-1.5" title="Parar"><i class="fa-solid fa-circle-stop"></i></button>
+        <div class="flex gap-1.5">
+          <button onclick="startTimer(60)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 active:scale-95 transition">60s</button>
+          <button onclick="startTimer(90)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 active:scale-95 transition">90s</button>
+          <button onclick="startTimer(120)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 active:scale-95 transition">120s</button>
+          <button onclick="stopTimer()" class="w-8 h-7 rounded-lg bg-rose-950/40 border border-rose-800/40 text-rose-400 flex items-center justify-center text-xs active:scale-95 transition"><i class="fa-solid fa-stop"></i></button>
         </div>
       </div>
 
-      <!-- Exercises List Container -->
-      <div class="flex justify-between items-center px-1">
-        <h3 id="workout-label" class="text-sm font-bold text-white">Treino A — Push</h3>
-        <span id="workout-stats-badge" class="text-xs text-slate-400 font-medium">5 exercícios</span>
-      </div>
-
-      <!-- GitHub Folder Notice Card -->
-      <div class="bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-slate-900 border border-blue-500/30 rounded-xl p-3 text-xs flex flex-col gap-2">
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex items-start gap-2.5">
-            <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <i class="fa-solid fa-images text-xs"></i>
-            </div>
-            <div class="text-[11px] leading-relaxed text-slate-300">
-              <span class="font-bold text-white block mb-0.5">Pasta <code class="text-cyan-300 bg-slate-950 px-1 py-0.5 rounded border border-slate-800">imagens/</code> (.PNG)</span>
-              O app busca arquivos <code class="text-cyan-300 font-bold">.png</code> (com e sem acento/espaço).
-            </div>
-          </div>
-          <!-- Diagnostic trigger -->
-          <button onclick="openDiagnosticModal()" class="px-2.5 py-1 rounded-lg bg-cyan-600/30 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 text-[11px] font-bold transition flex items-center gap-1.5 flex-shrink-0 active:scale-95">
-            <i class="fa-solid fa-stethoscope text-[10px]"></i>
-            <span>Testar Links</span>
-          </button>
-        </div>
-      </div>
-
-      <div id="exercises-container" class="space-y-3.5">
-        <!-- Rendered dynamically via JavaScript -->
+      <!-- LISTA DE CARDS DE EXERCÍCIOS -->
+      <div id="exercise-list" class="space-y-4">
+        <!-- Renderizado via JavaScript -->
       </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- TAB 2: NUTRITION (ALIMENTAÇÃO ~3.000 KCAL) -->
-    <!-- ========================================== -->
-    <section id="tab-nutrition" class="space-y-4 hidden">
-      <!-- Target Calories Card -->
-      <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/50 border border-purple-500/30 rounded-2xl p-4 shadow-xl">
-        <div class="flex justify-between items-start mb-3">
+    <!-- VIEW: HISTÓRICO GERAL -->
+    <section id="view-historico" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-white">Histórico de Treinos</h2>
+          <p class="text-xs text-slate-400">Todos os seus registros de carga e repetições</p>
+        </div>
+        <button onclick="clearHistoryConfirm()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold px-2 py-1 rounded bg-rose-950/30 border border-rose-800/30">
+          Limpar Tudo
+        </button>
+      </div>
+
+      <!-- FILTRO POR EXERCÍCIO -->
+      <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl">
+        <label class="text-xs font-semibold text-slate-400 block mb-1">Filtrar por Exercício</label>
+        <select id="filter-history-exercise" onchange="renderHistoryView()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+          <option value="all">Ver Todos os Exercícios</option>
+        </select>
+      </div>
+
+      <!-- TIMELINE DE REGISTROS -->
+      <div id="history-container" class="space-y-3">
+        <!-- Renderizado dinamicamente -->
+      </div>
+    </section>
+
+    <!-- VIEW: NUTRIÇÃO & METAS -->
+    <section id="view-nutricao" class="hidden space-y-4">
+      <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/30 border border-slate-800 p-5 rounded-2xl">
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-widest text-purple-400">Meta Diária • Bulking Limpo</span>
-            <h2 class="text-2xl font-black text-white">3.000 <span class="text-xs font-medium text-slate-400">kcal/dia</span></h2>
+            <h2 class="text-base font-bold text-white">Meta Diária de Hipertrofia</h2>
+            <p class="text-xs text-slate-400">Superávit limpo: ~3.000 kcal / dia</p>
           </div>
-          <div class="text-right">
-            <span class="text-xs font-semibold text-slate-300">Perfil: 78kg • 1,86m</span>
-            <div class="text-[11px] text-emerald-400 font-semibold">+250 kcal superávit</div>
-          </div>
+          <span class="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-bold">1,86m • 78kg</span>
         </div>
 
-        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-center">
-          <div class="bg-slate-850 bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60">
-            <div class="text-[11px] font-bold text-blue-400">Proteína</div>
-            <div class="text-base font-black text-white">160g</div>
-            <div class="text-[10px] text-slate-400">~640 kcal (2.0g/kg)</div>
+        <div class="grid grid-cols-3 gap-2 text-center pt-2">
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-blue-400 block">Proteína</span>
+            <span class="text-sm font-extrabold text-white">160g</span>
+            <span class="text-[10px] text-slate-500 block">~640 kcal</span>
           </div>
-          <div class="bg-slate-850 bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60">
-            <div class="text-[11px] font-bold text-amber-400">Carboidrato</div>
-            <div class="text-base font-black text-white">400g</div>
-            <div class="text-[10px] text-slate-400">~1.600 kcal</div>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-amber-400 block">Carboidratos</span>
+            <span class="text-sm font-extrabold text-white">400g</span>
+            <span class="text-[10px] text-slate-500 block">~1.600 kcal</span>
           </div>
-          <div class="bg-slate-850 bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60">
-            <div class="text-[11px] font-bold text-rose-400">Gorduras</div>
-            <div class="text-base font-black text-white">85g</div>
-            <div class="text-[10px] text-slate-400">~765 kcal</div>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-emerald-400 block">Gordura</span>
+            <span class="text-sm font-extrabold text-white">85g</span>
+            <span class="text-[10px] text-slate-500 block">~780 kcal</span>
           </div>
         </div>
       </div>
 
-      <!-- Visual Hand Portion Guide -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <h3 class="text-sm font-bold text-white mb-2.5 flex items-center gap-2">
-          <i class="fa-solid fa-hand text-purple-400"></i>
-          Guia Prático da Mão (Sem Balança)
+      <!-- GUIA DE PORÇÕES SEM BALANÇA -->
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2.5">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-hand text-amber-400"></i>
+          <span>Guia Visual da Mão (Sem Balança)</span>
         </h3>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">
-              <i class="fa-solid fa-hand-back-fist"></i>
-            </div>
-            <div>
-              <div class="font-bold text-slate-200">1 Punho Fechado</div>
-              <div class="text-[11px] text-slate-400">~100g Arroz ou Batata</div>
-            </div>
-          </div>
-          <div class="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
-              <i class="fa-solid fa-hand"></i>
-            </div>
-            <div>
-              <div class="font-bold text-slate-200">1 Palma da Mão</div>
-              <div class="text-[11px] text-slate-400">~120-150g Frango ou Ovos</div>
-            </div>
-          </div>
-          <div class="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-sm">
-              <i class="fa-solid fa-thumbs-up"></i>
-            </div>
-            <div>
-              <div class="font-bold text-slate-200">1 Polegar</div>
-              <div class="text-[11px] text-slate-400">~15g Azeite / Pasta Amendoim</div>
-            </div>
-          </div>
-          <div class="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
-              <i class="fa-solid fa-hand-holding"></i>
-            </div>
-            <div>
-              <div class="font-bold text-slate-200">2 Mãos em Concha</div>
-              <div class="text-[11px] text-slate-400">Vegetais e Saladas livres</div>
-            </div>
-          </div>
-        </div>
+        <ul class="text-xs text-slate-300 space-y-2">
+          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span> <strong>Palma da mão:</strong> ~150g de carne, frango ou peixe (~30-35g proteína).</li>
+          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span> <strong>Punho fechado:</strong> ~100g de arroz cozido, mandioca ou batata.</li>
+          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> <strong>Polegar inteiro:</strong> ~15ml de azeite ou pasta de amendoim (~12g gordura).</li>
+        </ul>
       </div>
 
-      <!-- Water Tracker -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <div class="flex justify-between items-center mb-2">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-droplet text-cyan-400"></i>
-            <span class="text-sm font-bold text-white">Hidratação (Meta: 3.500 ml)</span>
-          </div>
-          <span id="water-text" class="text-xs font-bold text-cyan-400">0 / 3.500 ml</span>
-        </div>
-        <div class="w-full bg-slate-800 rounded-full h-2.5 mb-3 overflow-hidden">
-          <div id="water-bar" class="bg-cyan-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="addWater(250)" class="flex-1 bg-slate-800 hover:bg-slate-700 py-2 rounded-xl text-xs font-bold text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-glass-water text-cyan-400"></i> +250 ml
-          </button>
-          <button onclick="addWater(500)" class="flex-1 bg-slate-800 hover:bg-slate-700 py-2 rounded-xl text-xs font-bold text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-bottle-water text-cyan-400"></i> +500 ml
-          </button>
-          <button onclick="resetWater()" class="px-3 bg-slate-800 hover:bg-rose-950/40 text-rose-400 py-2 rounded-xl text-xs font-bold transition">
-            Zerar
-          </button>
-        </div>
-      </div>
-
-      <!-- Meals checklist -->
-      <div class="space-y-2.5">
-        <div class="flex justify-between items-center px-1">
-          <h3 class="text-sm font-bold text-white">Refeições Estruturadas</h3>
-          <span class="text-[11px] text-slate-400">Marque ao cumprir</span>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <input type="checkbox" id="chk-meal-1" onchange="toggleMealCheck(1, this.checked)" class="mt-1 w-5 h-5 rounded accent-purple-500 cursor-pointer">
-          <label for="chk-meal-1" class="flex-1 cursor-pointer">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold text-white">1. Café da Manhã Energético</span>
-              <span class="text-xs font-semibold text-purple-400">~600 kcal</span>
-            </div>
-            <p class="text-[11px] text-slate-300 mt-1">3 ovos mexidos + 2 fatias de pão integral + 1 banana com 30g de aveia e fio de mel.</p>
-            <div class="text-[10px] text-slate-500 mt-1 font-medium">30g Proteína • 70g Carboidrato</div>
-          </label>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <input type="checkbox" id="chk-meal-2" onchange="toggleMealCheck(2, this.checked)" class="mt-1 w-5 h-5 rounded accent-purple-500 cursor-pointer">
-          <label for="chk-meal-2" class="flex-1 cursor-pointer">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold text-white">2. Almoço Completo</span>
-              <span class="text-xs font-semibold text-purple-400">~850 kcal</span>
-            </div>
-            <p class="text-[11px] text-slate-300 mt-1">6 colheres cheias de arroz (180g) + 1 concha de feijão (100g) + 180g de carne ou frango grelhado + salada com azeite.</p>
-            <div class="text-[10px] text-slate-500 mt-1 font-medium">45g Proteína • 105g Carboidrato</div>
-          </label>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <input type="checkbox" id="chk-meal-3" onchange="toggleMealCheck(3, this.checked)" class="mt-1 w-5 h-5 rounded accent-purple-500 cursor-pointer">
-          <label for="chk-meal-3" class="flex-1 cursor-pointer">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold text-white">3. Shake Pré/Pós-Treino</span>
-              <span class="text-xs font-semibold text-purple-400">~450 kcal</span>
-            </div>
-            <p class="text-[11px] text-slate-300 mt-1">1 scoop Whey Protein (30g) batido com 200ml leite + 1 banana grande + 30g de pasta de amendoim ou aveia.</p>
-            <div class="text-[10px] text-slate-500 mt-1 font-medium">35g Proteína • 45g Carboidrato</div>
-          </label>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <input type="checkbox" id="chk-meal-4" onchange="toggleMealCheck(4, this.checked)" class="mt-1 w-5 h-5 rounded accent-purple-500 cursor-pointer">
-          <label for="chk-meal-4" class="flex-1 cursor-pointer">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold text-white">4. Jantar de Recuperação</span>
-              <span class="text-xs font-semibold text-purple-400">~800 kcal</span>
-            </div>
-            <p class="text-[11px] text-slate-300 mt-1">200g batata inglesa ou arroz cozido + 180g peito de frango ou patinho moído + legumes cozidos.</p>
-            <div class="text-[10px] text-slate-500 mt-1 font-medium">42g Proteína • 95g Carboidrato</div>
-          </label>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <input type="checkbox" id="chk-meal-5" onchange="toggleMealCheck(5, this.checked)" class="mt-1 w-5 h-5 rounded accent-purple-500 cursor-pointer">
-          <label for="chk-meal-5" class="flex-1 cursor-pointer">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold text-white">5. Ceia Noturna Anabólica</span>
-              <span class="text-xs font-semibold text-purple-400">~300 kcal</span>
-            </div>
-            <p class="text-[11px] text-slate-300 mt-1">1 pote de iogurte natural com 20g de castanhas e 1 maçã fatiada.</p>
-            <div class="text-[10px] text-slate-500 mt-1 font-medium">15g Proteína • 25g Carboidrato</div>
-          </label>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- TAB 3: VISUAL GUIDE GALLERY -->
-    <!-- ========================================== -->
-    <section id="tab-gallery" class="space-y-4 hidden">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <h3 class="text-sm font-bold text-white mb-1">Catálogo Visual Completo de Movimentos</h3>
-        <p class="text-xs text-slate-400 mb-3">
-          Todos os exercícios com foto nítida e anatomia. Você pode clicar para ver o passo a passo ou carregar sua própria imagem personalizada para qualquer um deles.
-        </p>
-
-        <div class="flex gap-2 overflow-x-auto pb-2 custom-scroll mb-3">
-          <button onclick="filterGallery('all')" class="gallery-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-cyan-600 text-white flex-shrink-0">Todos</button>
-          <button onclick="filterGallery('push')" class="gallery-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 flex-shrink-0">Push</button>
-          <button onclick="filterGallery('pull')" class="gallery-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 flex-shrink-0">Pull</button>
-          <button onclick="filterGallery('legs')" class="gallery-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 flex-shrink-0">Legs</button>
-        </div>
-
-        <div id="gallery-grid" class="grid grid-cols-2 gap-3">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- TAB 4: PROGRESS & LOGS -->
-    <!-- ========================================== -->
-    <section id="tab-progress" class="space-y-4 hidden">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <h3 class="text-sm font-bold text-white mb-1">Evolução Semanal de Peso (Jejum)</h3>
-        <p class="text-xs text-slate-400 mb-4">Ganho limpo projetado: 250g a 400g/semana (~1kg a 1,5kg por mês) para preservar definição muscular.</p>
-
-        <div class="grid grid-cols-2 gap-2.5 mb-4">
-          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60">
-            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Peso Inicial</span>
-            <span class="text-xl font-black text-white">78.0 kg</span>
-          </div>
-          <div class="bg-slate-800/80 p-3 rounded-xl border border-emerald-500/40">
-            <span class="text-[10px] text-emerald-400 block font-semibold uppercase">Meta Atual</span>
-            <span class="text-xl font-black text-emerald-400">82.0 kg</span>
-          </div>
-        </div>
-
-        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-          <div class="flex justify-between items-center mb-2.5">
-            <span class="text-xs font-bold text-slate-200">Registros Recentes</span>
-            <button onclick="promptNewWeight()" class="text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1">
-              <i class="fa-solid fa-plus text-[10px]"></i> Novo Peso
-            </button>
-          </div>
-          <ul id="weight-history-list" class="text-xs space-y-2 divide-y divide-slate-800/70 text-slate-300">
-            <!-- Dynamic entries -->
-          </ul>
-        </div>
-      </div>
-
-      <!-- Functional Exercises Box -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-emerald-400"></i> Proteção Articular & Basquete
-        </h4>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div onclick="openExerciseModal('wall_sit')" class="bg-slate-850 bg-slate-800/50 p-3 rounded-xl border border-slate-700/60 cursor-pointer hover:border-cyan-500 transition">
-            <div class="font-bold text-white mb-0.5">Wall Sit (Parede)</div>
-            <div class="text-[10px] text-cyan-400">Isometria para Tendão Patelar</div>
-          </div>
-          <div onclick="openExerciseModal('step_up')" class="bg-slate-850 bg-slate-800/50 p-3 rounded-xl border border-slate-700/60 cursor-pointer hover:border-cyan-500 transition">
-            <div class="font-bold text-white mb-0.5">Step-up na Caixa</div>
-            <div class="text-[10px] text-emerald-400">Pliometria e Salto Vertical</div>
-          </div>
+      <!-- CHECKLIST DE REFEIÇÕES -->
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+        <h3 class="text-sm font-bold text-white">Checklist de Refeições Diárias</h3>
+        <div id="meals-checklist" class="space-y-2">
+          <!-- Gerado via JS -->
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ========================================== -->
-  <!-- MODAL: DETAILED EXERCISE VIEW & UPLOAD -->
-  <!-- ========================================== -->
-  <div id="exercise-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-5 max-h-[92vh] overflow-y-auto custom-scroll">
-      
-      <!-- Modal Header -->
-      <div class="flex justify-between items-start mb-3">
+  <!-- MODAL: VISUALIZAR IMAGEM EM ALTA DEFINIÇÃO -->
+  <div id="image-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
         <div>
-          <span id="modal-category" class="text-[10px] font-extrabold uppercase tracking-widest text-cyan-400">Treino Push</span>
-          <h3 id="modal-title" class="text-lg font-black text-white leading-tight">Supino Reto</h3>
+          <h3 id="modal-title" class="text-sm font-bold text-white">Supino Reto</h3>
+          <p id="modal-subtitle" class="text-[11px] text-slate-400">Guia de Execução</p>
         </div>
-        <button onclick="closeExerciseModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
-          <i class="fa-solid fa-xmark"></i>
+        <button onclick="closeImageModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:bg-slate-700">
+          <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
-      <!-- Real Image Presentation Box with Reliable Fallback -->
-      <div class="w-full bg-slate-950 rounded-2xl mb-3.5 border border-slate-800 overflow-hidden relative group p-2 flex items-center justify-center min-h-[220px]">
-        <img id="modal-image" src="" alt="Exercício" class="w-full max-h-72 object-contain rounded-xl transition-all duration-300" onerror="handleImageError(this)">
-        <div class="absolute bottom-3 right-3 bg-black/80 backdrop-blur-md text-[10px] font-bold text-white px-2.5 py-1 rounded-md border border-white/10 flex items-center gap-1.5">
-          <i class="fa-solid fa-check text-emerald-400"></i> Guia Verificado
-        </div>
+      <div class="p-3 bg-black flex items-center justify-center overflow-auto flex-1">
+        <img id="modal-img" src="" alt="Execução do exercício" class="max-h-[60vh] max-w-full object-contain rounded-lg" />
       </div>
 
-      <!-- Custom Photo Upload for this specific exercise -->
-      <div class="mb-4 bg-slate-950/70 p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-camera text-cyan-400 text-sm"></i>
+      <div class="p-4 border-t border-slate-800 bg-slate-900 space-y-3">
+        <div>
+          <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Dica de Execução & Foco Muscular</span>
+          <p id="modal-desc" class="text-xs text-slate-300 leading-relaxed"></p>
+        </div>
+        <div class="flex gap-2">
+          <label class="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold text-center cursor-pointer border border-slate-700 transition">
+            <i class="fa-solid fa-camera mr-1 text-blue-400"></i> Trocar Imagem Deste Aparelho
+            <input type="file" accept="image/*" class="hidden" onchange="uploadCustomImageForModal(this)" />
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR NOVO EXERCÍCIO -->
+  <div id="new-exercise-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle text-blue-400"></i>
+          <span>Cadastrar Novo Exercício</span>
+        </h3>
+        <button onclick="closeNewExerciseModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Nome do Exercício *</label>
+          <input type="text" id="new-ex-name" placeholder="Ex: Crossover Polia Média" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <div class="text-xs font-bold text-white">Sua própria foto</div>
-            <div class="text-[10px] text-slate-400">Substitua a imagem por uma foto sua</div>
+            <label class="font-bold text-slate-300 block mb-1">Divisão *</label>
+            <select id="new-ex-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+              <option value="push">Treino A (Push)</option>
+              <option value="pull">Treino B (Pull)</option>
+              <option value="legs">Treino C (Legs)</option>
+              <option value="outros">Funcional / Core</option>
+            </select>
           </div>
-        </div>
-        <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 transition active:scale-95">
-          <span>Escolher Foto</span>
-          <input type="file" id="modal-file-input" accept="image/*" class="hidden" onchange="handleUserPhotoUpload(event)">
-        </label>
-      </div>
-
-      <!-- Content Specs -->
-      <div class="space-y-3.5 text-xs">
-        <div>
-          <h4 class="font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
-            <i class="fa-solid fa-crosshairs text-cyan-400"></i> Músculos Trabalhados:
-          </h4>
-          <div id="modal-muscles" class="flex flex-wrap gap-1.5">
-            <!-- Dynamic muscle badges -->
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Faixa Sugerida</label>
+            <input type="text" id="new-ex-sets" placeholder="Ex: 3 x 10-12" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" />
           </div>
         </div>
 
         <div>
-          <h4 class="font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
-            <i class="fa-solid fa-list-check text-cyan-400"></i> Execução Passo a Passo:
-          </h4>
-          <ol id="modal-steps" class="list-decimal list-inside space-y-1.5 text-slate-300 leading-relaxed bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
-            <!-- Dynamic steps -->
-          </ol>
+          <label class="font-bold text-slate-300 block mb-1">Músculo Principal</label>
+          <input type="text" id="new-ex-muscle" placeholder="Ex: Peitoral Superior, Deltóide" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" />
         </div>
 
-        <div class="bg-amber-950/30 border border-amber-500/40 p-3 rounded-xl text-amber-200">
-          <div class="font-bold mb-0.5 flex items-center gap-1.5 text-amber-400">
-            <i class="fa-solid fa-shield-halved"></i> Dica de Biomecânica & Segurança:
+        <!-- SELEÇÃO DA IMAGEM -->
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+          <label class="font-bold text-slate-300 block">Imagem de Referência</label>
+          
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">Opção 1: Nome do arquivo na pasta <code class="text-blue-400">imagens/</code></span>
+            <input type="text" id="new-ex-img-filename" placeholder="Ex: crossover.png ou c:/..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white" />
           </div>
-          <span id="modal-safety" class="text-[11px] leading-normal">Mantenha a postura alinhada e controle a descida.</span>
+
+          <div class="text-center text-[10px] text-slate-500 uppercase font-bold">— OU —</div>
+
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">Opção 2: Carregar foto do celular/PC (salva no app)</span>
+            <input type="file" id="new-ex-img-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600/20 file:text-blue-400 hover:file:bg-blue-600/30 cursor-pointer" />
+          </div>
         </div>
-      </div>
 
-      <button onclick="closeExerciseModal()" class="w-full mt-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl transition shadow-lg shadow-cyan-600/20 active:scale-95">
-        Concluir Leitura
-      </button>
-    </div>
-  </div>
-
-  <!-- Information Modal (Corrida & Basquete) -->
-  <div id="info-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 max-h-[85vh] overflow-y-auto">
-      <div class="flex justify-between items-start mb-3">
-        <h3 id="info-modal-title" class="text-base font-bold text-white">Atividade Complementar</h3>
-        <button onclick="closeInfoModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div id="info-modal-content" class="text-xs text-slate-300 space-y-3 leading-relaxed">
-        <!-- Dynamic content -->
-      </div>
-      <button onclick="closeInfoModal()" class="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition">
-        Fechar
-      </button>
-    </div>
-  </div>
-
-  <!-- Diagnostic Modal for testing .png path resolution on GitHub Pages -->
-  <div id="diagnostic-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-5 max-h-[85vh] overflow-y-auto custom-scroll">
-      <div class="flex justify-between items-center mb-3">
         <div>
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-network-wired text-cyan-400"></i> Diagnóstico da Pasta imagens/
-          </h3>
-          <p class="text-[11px] text-slate-400">Status em tempo real das imagens .PNG no seu GitHub Pages</p>
-        </div>
-        <button onclick="closeDiagnosticModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="space-y-2 mb-4 text-xs" id="diagnostic-results">
-        <div class="p-3 rounded-xl bg-slate-950 text-slate-400 text-center">
-          Clique no botão abaixo para testar as conexões HTTP das imagens.
+          <label class="font-bold text-slate-300 block mb-1">Dica de Execução / Postura</label>
+          <textarea id="new-ex-desc" rows="2" placeholder="Ex: Manter cotovelos alinhados e peito estufado..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
         </div>
       </div>
 
-      <div class="flex gap-2">
-        <button onclick="runImageDiagnostics()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-2">
-          <i class="fa-solid fa-play"></i> Iniciar Verificação das Imagens
-        </button>
-        <button onclick="closeDiagnosticModal()" class="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">
-          Fechar
-        </button>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeNewExerciseModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Cancelar</button>
+        <button onclick="saveNewExercise()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25">Cadastrar</button>
       </div>
     </div>
   </div>
 
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-[#0c121e]/95 backdrop-blur-lg border-t border-slate-800 py-2">
-    <div class="max-w-lg mx-auto px-4 flex justify-around items-center">
-      <button onclick="switchTab('workouts')" id="nav-workouts" class="flex flex-col items-center gap-1 active-nav-btn transition">
-        <i class="fa-solid fa-dumbbell text-lg"></i>
-        <span class="text-[10px]">Treinos</span>
+  <!-- NAVEGAÇÃO INFERIOR FIXA (ESTILO APP NATIVO) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-6 py-2">
+    <div class="max-w-md mx-auto flex items-center justify-around">
+      <button onclick="switchTab('treino')" id="tab-treino" class="flex flex-col items-center gap-1 text-blue-400 py-1 transition">
+        <i class="fa-solid fa-dumbbell text-base"></i>
+        <span class="text-[10px] font-bold">Treinos</span>
       </button>
-      <button onclick="switchTab('nutrition')" id="nav-nutrition" class="flex flex-col items-center gap-1 text-slate-400 hover:text-purple-400 transition">
-        <i class="fa-solid fa-bowl-food text-lg"></i>
-        <span class="text-[10px]">Nutrição</span>
+      <button onclick="switchTab('historico')" id="tab-historico" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 py-1 transition">
+        <i class="fa-solid fa-chart-line text-base"></i>
+        <span class="text-[10px] font-bold">Histórico</span>
       </button>
-      <button onclick="switchTab('gallery')" id="nav-gallery" class="flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-400 transition">
-        <i class="fa-solid fa-images text-lg"></i>
-        <span class="text-[10px]">Guia Visual</span>
-      </button>
-      <button onclick="switchTab('progress')" id="nav-progress" class="flex flex-col items-center gap-1 text-slate-400 hover:text-emerald-400 transition">
-        <i class="fa-solid fa-chart-line text-lg"></i>
-        <span class="text-[10px]">Progresso</span>
+      <button onclick="switchTab('nutricao')" id="tab-nutricao" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 py-1 transition">
+        <i class="fa-solid fa-utensils text-base"></i>
+        <span class="text-[10px] font-bold">Nutrição</span>
       </button>
     </div>
   </nav>
 
+  <!-- JAVASCRIPT: MOTOR COMPLETO DE DADOS, IMAGENS E PERSISTÊNCIA -->
   <script>
-    // Fallback SVG data generator so an image never looks broken
-    function generateFallbackSVG(title, accent) {
-      const bg = '#0f172a';
-      const color = accent || '#38bdf8';
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" fill="none">
-          <rect width="600" height="400" fill="${bg}"/>
-          <circle cx="300" cy="170" r="50" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2"/>
-          <path d="M260 250 L340 250 M300 230 L300 270" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-          <text x="300" y="320" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="18" font-weight="bold">${title}</text>
-          <text x="300" y="350" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="12">Foto da pasta imagens/</text>
-        </svg>
-      `;
-      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    }
-
-    // Helper to generate safe URL candidates (handles UTF-8 accents and space encoding)
-    function buildImageCandidatePaths(baseList) {
-      const extensions = ['.png', '.PNG', '.jpg', '.jpeg', '.webp'];
-      const candidates = [];
-      baseList.forEach(rawBase => {
-        extensions.forEach(ext => {
-          const direct = `${rawBase}${ext}`;
-          const encoded = encodeURI(direct);
-          if (!candidates.includes(direct)) candidates.push(direct);
-          if (direct !== encoded && !candidates.includes(encoded)) candidates.push(encoded);
-        });
-      });
-      return candidates;
-    }
-
-    // Direct database mapped with .png primary priority, URL variations and exact filenames
-    const exercisesDB = {
-      // PUSH - Exact requested filenames in PNG format
-      supino_reto: {
-        id: "supino_reto",
+    // 1. BANCO DE EXERCÍCIOS PADRÃO (Incluso com suas 5 imagens iniciais e variações de caminho)
+    const DEFAULT_EXERCISES = [
+      // PUSH (A)
+      {
+        id: "push-supino",
         name: "Supino Reto com Barra",
-        category: "Peitoral Maior • Tríceps • Ombro",
-        workout: "push",
-        series: "4 séries",
-        reps: "6 a 10 reps",
-        rest: "90s - 120s",
-        imgBaseNames: ["imagens/Supino", "imagens/supino"],
-        img: "imagens/Supino.png",
-        muscles: ["Peitoral Maior", "Tríceps Braquial", "Deltoide Anterior"],
-        steps: [
-          "Deite no banco com os olhos alinhados diretamente abaixo da barra.",
-          "Retraia e deprima as escápulas contra o banco ('feche as asas').",
-          "Desça a barra controlando o peso até encostar na linha média/inferior do peito.",
-          "Empurre a barra de forma potente mantendo os pés cravados no chão."
-        ],
-        safety: "Mantenha os cotovelos a cerca de 60° em relação ao tronco para proteger o manguito rotador."
+        category: "push",
+        defaultSetsReps: "4 x 6-10",
+        muscle: "Peitoral Maior, Deltóide Anterior, Tríceps",
+        imagePath: "imagens/Supino.png",
+        imageFallback: "Supino.png",
+        instructions: "Mantenha as escápulas aduzidas e os pés firmes no chão. Desça a barra de forma controlada até o terço inferior do esterno e empurre com explosão."
       },
-      desenvolvimento_halteres: {
-        id: "desenvolvimento_halteres",
+      {
+        id: "push-desenvolvimento",
         name: "Desenvolvimento com Halteres",
-        category: "Deltoide Anterior & Lateral • Tríceps",
-        workout: "push",
-        series: "3 séries",
-        reps: "8 a 12 reps",
-        rest: "90s",
-        imgBaseNames: [
-          "imagens/Desenvolvimento com Halteres",
-          "imagens/desenvolvimento com halteres",
-          "imagens/desenvolvimento-com-halteres",
-          "imagens/desenvolvimento"
-        ],
-        img: "imagens/Desenvolvimento com Halteres.png",
-        muscles: ["Deltoide Anterior", "Deltoide Lateral", "Tríceps Braquial", "Trapézio"],
-        steps: [
-          "Sentado no banco com apoio nas costas, comece com os halteres na altura dos ombros.",
-          "Cotovelos levemente à frente no plano escapular (~30° à frente da linha do corpo).",
-          "Empurre os halteres para cima sem bater um no outro no topo.",
-          "Desça de forma controlada até o nível do queixo."
-        ],
-        safety: "Mantenha o abdômen firme para não arquear a coluna lombar na subida."
+        category: "push",
+        defaultSetsReps: "3 x 8-12",
+        muscle: "Deltoide Anterior & Lateral, Tríceps",
+        imagePath: "imagens/Desenvolvimento com Halteres.png",
+        imageFallback: "Desenvolvimento com Halteres.png",
+        instructions: "Banco a ~75°. Suba os halteres sem bater no topo e mantenha os cotovelos levemente apontados para a frente."
       },
-      crucifixo_halteres: {
-        id: "crucifixo_halteres",
-        name: "Crucifixo com Halteres",
-        category: "Isolamento de Peitoral • Alongamento Máximo",
-        workout: "push",
-        series: "3 séries",
-        reps: "10 a 12 reps",
-        rest: "75s",
-        imgBaseNames: ["imagens/Crucifixo", "imagens/crucifixo"],
-        img: "imagens/Crucifixo.png",
-        muscles: ["Peitoral Maior", "Deltoide Anterior", "Bíceps (Estabilizador)"],
-        steps: [
-          "Deitado no banco reto com um halter em cada mão apontando para cima.",
-          "Mantenha uma leve flexão nos cotovelos durante todo o arco de descida.",
-          "Abra os braços até sentir um alongamento profundo e confortável no peito.",
-          "Feche os braços como se estivesse abraçando um barril grande."
-        ],
-        safety: "Não deixe os cotovelos descerem além do nível do banco se sentir desconforto nos ombros."
+      {
+        id: "push-crucifixo",
+        name: "Crucifixo Reto",
+        category: "push",
+        defaultSetsReps: "3 x 10-15",
+        muscle: "Peitoral Maior (Foco em alongamento)",
+        imagePath: "imagens/Crucifixo.png",
+        imageFallback: "Crucifixo.png",
+        instructions: "Cotovelos levemente flexionados durante todo o movimento. Desça até sentir o alongamento máximo do peito e una os pesos controlando o retorno."
       },
-      triceps_corda: {
-        id: "triceps_corda",
+      {
+        id: "push-triceps",
         name: "Tríceps Corda no Pulley",
-        category: "Tríceps Braquial (Cabeça Lateral e Longa)",
-        workout: "push",
-        series: "3 séries",
-        reps: "10 a 15 reps",
-        rest: "60s",
-        imgBaseNames: [
-          "imagens/Tríceps",
-          "imagens/tríceps",
-          "imagens/Triceps",
-          "imagens/triceps"
-        ],
-        img: "imagens/Tríceps.png",
-        muscles: ["Tríceps Braquial", "Ancôneo", "Extensores do Punho"],
-        steps: [
-          "Tronco levemente inclinado à frente com cotovelos colados ao lado da caixa torácica.",
-          "Empurre a corda para baixo estendendo os braços.",
-          "No ponto mais baixo, abra as pontas da corda para fora para contração máxima.",
-          "Suba de volta controlando até o ângulo de 90° no cotovelo."
-        ],
-        safety: "Evite movimentar os ombros ou balançar o tronco para pegar impulso."
+        category: "push",
+        defaultSetsReps: "3 x 10-15",
+        muscle: "Tríceps Braquial (Cabeça Lateral)",
+        imagePath: "imagens/Tríceps.png",
+        imageFallback: "Tríceps.png",
+        instructions: "Cotovelos travados na lateral do tronco. No final da extensão, afaste as pontas da corda para contração máxima."
       },
-      flexao_braco: {
-        id: "flexao_braco",
-        name: "Flexão de Braço",
-        category: "Finalizador de Volume • Peitoral e Core",
-        workout: "push",
-        series: "3 séries",
-        reps: "Até a falha técnica",
-        rest: "60s",
-        imgBaseNames: [
-          "imagens/flexao",
-          "imagens/Flexao",
-          "imagens/flexão",
-          "imagens/Flexão"
-        ],
-        img: "imagens/flexao.png",
-        muscles: ["Peitoral Maior", "Core Abdominal", "Deltoide Anterior", "Tríceps"],
-        steps: [
-          "Posicione as mãos um pouco mais largas que a linha dos ombros.",
-          "Mantenha o corpo como uma prancha rígida dos calcanhares à cabeça.",
-          "Desça até o peito quase encostar no chão com cotovelos a ~45°.",
-          "Empurre o solo de volta com firmeza."
-        ],
-        safety: "Não deixe o quadril cair nem arqueie a lombar durante as repetições finais."
+      {
+        id: "push-flexao",
+        name: "Flexão de Braço (Push-up)",
+        category: "push",
+        defaultSetsReps: "3 x Até a Falha",
+        muscle: "Peitoral, Tríceps e Core",
+        imagePath: "imagens/flexao.png",
+        imageFallback: "flexao.png",
+        instructions: "Mantenha o corpo em linha reta da cabeça aos calcanhares. Glúteos e abdômen firmes sem deixar a pelve afundar."
       },
-
-      // PULL
-      puxada_pulley: {
-        id: "puxada_pulley",
-        name: "Puxada Frontal no Pulley (Lat Pulldown)",
-        category: "Dorsais • Largura das Costas (V-Taper)",
-        workout: "pull",
-        series: "4 séries",
-        reps: "6 a 10 reps",
-        rest: "90s - 120s",
-        imgBaseNames: ["imagens/Puxada", "imagens/puxada"],
-        img: "imagens/Puxada.png",
-        muscles: ["Latissimus Dorsi (Grande Dorsal)", "Redondo Maior", "Bíceps Braquial", "Romboides"],
-        steps: [
-          "Ajuste a almofada da coxa para fixar firmemente o corpo no banco.",
-          "Segure a barra com pegada pronada na largura dos ombros ou ligeiramente maior.",
-          "Inicie deprimindo as escápulas e puxe a barra na direção da clavícula.",
-          "Retorne controlando o peso até os braços estenderem completamente no topo."
-        ],
-        safety: "Nunca puxe a barra por trás da cabeça para não forçar a coluna cervical."
+      
+      // PULL (B)
+      {
+        id: "pull-puxada",
+        name: "Puxada Frontal no Pulley",
+        category: "pull",
+        defaultSetsReps: "4 x 6-10",
+        muscle: "Dorsal / Latíssimo, Bíceps",
+        imagePath: "imagens/puxada.png",
+        imageFallback: "puxada-frontal.png",
+        instructions: "Puxe direcionando os cotovelos para o chão e para trás. Estufe o peito em direção à barra e controle a subida."
       },
-      remada_curvada: {
-        id: "remada_curvada",
-        name: "Remada Curvada com Barra (Bent-Over Row)",
-        category: "Espessura de Costas • Trapézio & Romboides",
-        workout: "pull",
-        series: "4 séries",
-        reps: "8 a 12 reps",
-        rest: "90s",
-        imgBaseNames: ["imagens/Remada Curvada", "imagens/remada-curvada", "imagens/remada_curvada", "imagens/remada"],
-        img: "imagens/Remada Curvada.png",
-        muscles: ["Trapézio Médio/Inferior", "Romboides", "Dorsais", "Deltoide Posterior", "Eretores"],
-        steps: [
-          "Com os joelhos destravados, incline o tronco mantendo as costas retas e o peito aberto.",
-          "Segure a barra com pegada na largura dos ombros.",
-          "Puxe a barra em direção ao umbigo conduzindo a força com os cotovelos para trás.",
-          "Aperte as escápulas por 1 segundo no pico do movimento e desça controlando."
-        ],
-        safety: "Mantenha o core rígido. Se sentir a lombar, reduza o peso ou aumente o apoio."
+      {
+        id: "pull-remada-curvada",
+        name: "Remada Curvada com Barra",
+        category: "pull",
+        defaultSetsReps: "4 x 8-12",
+        muscle: "Dorsais, Trapézio, Romboides",
+        imagePath: "imagens/remada-curvada.png",
+        imageFallback: "remada.png",
+        instructions: "Incline o tronco a ~45° com a lombar estendida e abdômen travado. Tracione a barra rente às coxas em direção ao umbigo."
       },
-      remada_unilateral: {
-        id: "remada_unilateral",
-        name: "Remada Unilateral com Halter (Serrote)",
-        category: "Densidade Dorsal Unilateral • Postura Correta",
-        workout: "pull",
-        series: "3 séries",
-        reps: "10 a 12 reps cada lado",
-        rest: "75s",
-        imgBaseNames: ["imagens/Remada Unilateral", "imagens/serrote", "imagens/remada_unilateral"],
-        img: "imagens/Remada Unilateral.png",
-        muscles: ["Grande Dorsal", "Romboides", "Deltoide Posterior", "Bíceps"],
-        steps: [
-          "Apoie um joelho e a mão do mesmo lado sobre o banco reto.",
-          "Mantenha a coluna neutra e o pescoço alinhado olhando para baixo.",
-          "Puxe o halter na direção do quadril sem girar a coluna.",
-          "Desça o halter alongando bem a dorsal sem deixar o ombro despencar."
-        ],
-        safety: "Evite balançar o corpo ou dar solavancos para subir o peso."
-      },
-      rosca_direta: {
-        id: "rosca_direta",
-        name: "Rosca Direta com Barra (Barbell Curl)",
-        category: "Braços • Bíceps Braquial Completo",
-        workout: "pull",
-        series: "3 séries",
-        reps: "8 a 12 reps",
-        rest: "60s",
-        imgBaseNames: ["imagens/Rosca Direta", "imagens/rosca-direta", "imagens/rosca_direta", "imagens/biceps"],
-        img: "imagens/Rosca Direta.png",
-        muscles: ["Bíceps Braquial (Cabeça Curta & Longa)", "Braquial Anterior", "Braquiorradial"],
-        steps: [
-          "Em pé com postura ereta e pés na largura dos ombros.",
-          "Segure a barra com as palmas voltadas para a frente.",
-          "Flexione os cotovelos elevando a barra até a contração máxima do bíceps.",
-          "Desça em 2 a 3 segundos resistindo à gravidade até esticar quase por completo."
-        ],
-        safety: "Não balance as costas nem jogue o quadril para frente para compensar a carga."
+      {
+        id: "pull-rosca",
+        name: "Rosca Direta com Barra",
+        category: "pull",
+        defaultSetsReps: "3 x 10-15",
+        muscle: "Bíceps Braquial & Braquiorradial",
+        imagePath: "imagens/rosca.png",
+        imageFallback: "rosca-direta.png",
+        instructions: "Sem impulsos do tronco. Suba espremendo o bíceps e desça em 2 a 3 segundos de fase excêntrica."
       },
 
-      // LEGS
-      agachamento_livre: {
-        id: "agachamento_livre",
-        name: "Agachamento Livre com Barra (Back Squat)",
-        category: "Pernas • Quadríceps, Glúteos & Core",
-        workout: "legs",
-        series: "4 séries",
-        reps: "6 a 10 reps",
-        rest: "120s",
-        imgBaseNames: ["imagens/Agachamento", "imagens/agachamento"],
-        img: "imagens/Agachamento.png",
-        muscles: ["Quadríceps Femoral", "Glúteo Máximo", "Adutores", "Eretores da Espinha"],
-        steps: [
-          "Apoie a barra firme sobre a musculatura do trapézio e tire do suporte.",
-          "Pés na largura dos ombros com pontas levemente voltadas para fora.",
-          "Inicie flexionando os joelhos e o quadril como se fosse sentar num banco baixo.",
-          "Desça até as coxas ficarem paralelas ao chão e suba empurrando o chão pelo calcanhar."
-        ],
-        safety: "Mantenha os joelhos apontando na mesma direção da ponta dos pés; nunca deixe entrarem para dentro."
+      // LEGS (C)
+      {
+        id: "legs-agachamento",
+        name: "Agachamento Livre com Barra",
+        category: "legs",
+        defaultSetsReps: "4 x 6-10",
+        muscle: "Quadríceps, Glúteo Máximo, Core",
+        imagePath: "imagens/agachamento.png",
+        imageFallback: "agachamento-livre.png",
+        instructions: "Barra apoiada no trapézio. Desça empurrando o quadril para trás e abrindo os joelhos na direção dos pés."
       },
-      terra_romeno: {
-        id: "terra_romeno",
+      {
+        id: "legs-rdl",
         name: "Levantamento Terra Romeno (RDL)",
-        category: "Cadeia Posterior • Glúteos & Isquiotibiais",
-        workout: "legs",
-        series: "4 séries",
-        reps: "8 a 12 reps",
-        rest: "90s",
-        imgBaseNames: ["imagens/Terra Romeno", "imagens/terra-romeno", "imagens/rdl"],
-        img: "imagens/Terra Romeno.png",
-        muscles: ["Isquiotibiais", "Glúteo Máximo", "Eretores da Coluna"],
-        steps: [
-          "Segure a barra com pegada pronada na largura das pernas.",
-          "Mantenha os joelhos semi-flexionados fixos nessa posição.",
-          "Empurre o quadril para trás mantendo a barra raspando rente às pernas.",
-          "Ao sentir o alongamento máximo dos posteriores de coxa, estenda o quadril contraindo os glúteos."
-        ],
-        safety: "Mantenha as costas 100% retas durante todo o percurso; não arredonde a lombar."
+        category: "legs",
+        defaultSetsReps: "3 x 8-12",
+        muscle: "Isquiotibiais (Posteriores) e Glúteos",
+        imagePath: "imagens/rdl.png",
+        imageFallback: "rdl-terra.png",
+        instructions: "Joelhos com leve flexão fixa. Projete o quadril para trás como se fosse fechar uma porta com o glúteo."
       },
-      leg_press: {
-        id: "leg_press",
-        name: "Leg Press 45°",
-        category: "Quadríceps & Glúteos • Carga Segura",
-        workout: "legs",
-        series: "3 séries",
-        reps: "10 a 12 reps",
-        rest: "90s",
-        imgBaseNames: ["imagens/Leg Press", "imagens/leg-press"],
-        img: "imagens/Leg Press.png",
-        muscles: ["Quadríceps", "Glúteo Máximo", "Panturrilhas"],
-        steps: [
-          "Acomode a lombar e os glúteos completamente colados no encosto.",
-          "Posicione os pés na largura dos ombros no meio da plataforma.",
-          "Destrave a máquina e desça a plataforma até formar 90° nos joelhos.",
-          "Empurre de volta estendendo as pernas sem 'trancar' os joelhos no final."
-        ],
-        safety: "Nunca descole o bumbum do banco no final da descida para proteger os discos lombares."
-      },
-      cadeira_extensora: {
-        id: "cadeira_extensora",
-        name: "Cadeira Extensora (Leg Extension)",
-        category: "Isolamento Completo de Quadríceps",
-        workout: "legs",
-        series: "3 séries",
-        reps: "12 a 15 reps",
-        rest: "60s",
-        imgBaseNames: ["imagens/Cadeira Extensora", "imagens/extensora"],
-        img: "imagens/Cadeira Extensora.png",
-        muscles: ["Quadríceps Femoral"],
-        steps: [
-          "Ajuste o encosto de modo que o joelho fique no mesmo eixo de rotação da máquina.",
-          "Apoie a almofada sobre a frente dos tornozelos.",
-          "Estenda as pernas até a contração total e segure 1 segundo no topo.",
-          "Desça suavemente controlando a descida do peso."
-        ],
-        safety: "Evite dar trancos explosivos com cargas acima do seu controle articular."
-      },
-      panturrilha_pe: {
-        id: "panturrilha_pe",
-        name: "Panturrilha em Pé com Halteres",
-        category: "Panturrilha • Salto & Estabilidade de Basquete",
-        workout: "legs",
-        series: "4 séries",
-        reps: "15 a 20 reps",
-        rest: "60s",
-        imgBaseNames: ["imagens/Panturrilha", "imagens/panturrilha"],
-        img: "imagens/Panturrilha.png",
-        muscles: ["Gastrocnêmio", "Sóleo", "Tibial Posterior"],
-        steps: [
-          "Apoie a ponta dos pés em um degrau ou step segurando um halter firme em cada mão.",
-          "Desça os calcanhares para sentir o alongamento máximo da panturrilha.",
-          "Suba na ponta dos pés com potência e congele 1 segundo no ponto mais alto.",
-          "Desça de forma suave e pausada."
-        ],
-        safety: "Evite 'quicar' rápido; o controle da descida é o segredo para crescer panturrilha."
-      },
-
-      // FUNCTIONAL / EXTRA
-      wall_sit: {
-        id: "wall_sit",
-        name: "Wall Sit (Agachamento Isométrico na Parede)",
-        category: "Isometria • Fortalecimento do Joelho & Tendão Patelar",
-        workout: "legs",
-        series: "3 séries",
-        reps: "35 a 45 segundos",
-        rest: "60s",
-        imgBaseNames: ["imagens/Wall Sit", "imagens/wall-sit"],
-        img: "imagens/Wall Sit.png",
-        muscles: ["Quadríceps", "Estabilizadores do Joelho", "Glúteos"],
-        steps: [
-          "Apoie as costas retas na parede e deslize até os joelhos ficarem em ângulo de 90°.",
-          "Pés firmes no chão na largura dos ombros.",
-          "Não apoie as mãos nas coxas.",
-          "Respire ritmicamente sustentando a contração isométrica."
-        ],
-        safety: "Essencial para proteger os tendões se você joga basquete ou corre com frequência."
-      },
-      step_up: {
-        id: "step_up",
-        name: "Step-Up na Caixa ou Banco",
-        category: "Unilateral • Pliometria, Salto Vertical & Glúteos",
-        workout: "legs",
-        series: "3 séries",
-        reps: "10 a 12 reps cada perna",
-        rest: "75s",
-        imgBaseNames: ["imagens/Step Up", "imagens/step-up"],
-        img: "imagens/Step Up.png",
-        muscles: ["Glúteo Máximo", "Quadríceps", "Panturrilhas"],
-        steps: [
-          "Pise com todo o pé sobre a caixa ou banco estável.",
-          "Empurre pelo calcanhar da perna que está em cima para elevar o corpo.",
-          "Fique completamente ereto no topo antes de descer de volta com controle."
-        ],
-        safety: "Não pegue impulso com a perna de trás no chão; deixe a perna de cima fazer a força."
+      {
+        id: "legs-extensora",
+        name: "Cadeira Extensora",
+        category: "legs",
+        defaultSetsReps: "3 x 12-15",
+        muscle: "Quadríceps Isolado",
+        imagePath: "imagens/extensora.png",
+        imageFallback: "cadeira-extensora.png",
+        instructions: "Ajuste o rolo logo acima dos tornozelos. Estenda completamente e segure 1 segundo no pico antes de descer."
       }
-    };
+    ];
 
-    // Sequential multi-extension fallback handler focusing on .png and URL-encoding
-    function handleImageError(imgElement) {
-      const exerciseId = imgElement.getAttribute('data-ex-id');
-      const ex = exercisesDB[exerciseId];
-      if (!ex) return;
+    // 2. ESTADO DO APLICATIVO
+    let appExercises = [];
+    let workoutLogs = [];
+    let currentCategory = "push";
+    let activeModalEx = null;
+    let timerInterval = null;
+    let timerSeconds = 0;
 
-      const candidates = buildImageCandidatePaths(ex.imgBaseNames || [`imagens/${ex.name}`]);
-      let attempt = parseInt(imgElement.getAttribute('data-attempt') || '0', 10);
+    // INICIALIZAÇÃO
+    window.addEventListener("DOMContentLoaded", () => {
+      loadStorageData();
+      renderExerciseList();
+      populateHistoryFilter();
+      renderMealsChecklist();
+    });
 
-      if (attempt < candidates.length) {
-        imgElement.setAttribute('data-attempt', (attempt + 1).toString());
-        imgElement.src = candidates[attempt];
+    function loadStorageData() {
+      // Carrega exercícios salvos (ou usa os padrões se for primeira vez)
+      const savedEx = localStorage.getItem("irontracker_exercises");
+      if (savedEx) {
+        try {
+          appExercises = JSON.parse(savedEx);
+        } catch (e) {
+          appExercises = [...DEFAULT_EXERCISES];
+        }
       } else {
-        // Stop retrying and show clear SVG fallback
-        imgElement.onerror = null;
-        imgElement.src = generateFallbackSVG(ex.name, '#38bdf8');
+        appExercises = [...DEFAULT_EXERCISES];
+        saveExercisesToStorage();
       }
-    }
 
-    // Diagnostic Modal Logic
-    function openDiagnosticModal() {
-      document.getElementById('diagnostic-modal').classList.remove('hidden');
-      runImageDiagnostics();
-    }
-
-    function closeDiagnosticModal() {
-      document.getElementById('diagnostic-modal').classList.add('hidden');
-    }
-
-    async function checkUrl(url) {
-      try {
-        const response = await fetch(url, { method: 'HEAD' });
-        return { ok: response.ok, status: response.status };
-      } catch (err) {
-        return { ok: false, status: 'Erro de Rede / CORS' };
-      }
-    }
-
-    async function runImageDiagnostics() {
-      const container = document.getElementById('diagnostic-results');
-      container.innerHTML = `
-        <div class="p-3 bg-slate-950 rounded-xl text-center text-cyan-400 font-bold text-xs flex items-center justify-center gap-2">
-          <i class="fa-solid fa-spinner fa-spin"></i> Testando arquivos .png na pasta imagens/...
-        </div>
-      `;
-
-      const pushKeys = workoutRoutines.push;
-      let html = '<div class="space-y-2">';
-
-      for (const key of pushKeys) {
-        const ex = exercisesDB[key];
-        const candidates = buildImageCandidatePaths(ex.imgBaseNames).slice(0, 3);
-        let foundCandidate = null;
-
-        for (const path of candidates) {
-          const res = await checkUrl(path);
-          if (res.ok) {
-            foundCandidate = { path, status: res.status };
-            break;
-          }
-        }
-
-        if (foundCandidate) {
-          html += `
-            <div class="p-2.5 bg-emerald-950/30 border border-emerald-500/40 rounded-xl flex items-center justify-between text-xs">
-              <div>
-                <span class="font-bold text-white block">${ex.name}</span>
-                <span class="text-[10px] text-emerald-400 font-mono">${foundCandidate.path}</span>
-              </div>
-              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">200 OK</span>
-            </div>
-          `;
-        } else {
-          const defaultPath = `${ex.imgBaseNames[0]}.png`;
-          html += `
-            <div class="p-2.5 bg-rose-950/30 border border-rose-500/40 rounded-xl flex flex-col gap-1 text-xs">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-white">${ex.name}</span>
-                <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[10px]">404 Não Encontrado</span>
-              </div>
-              <div class="text-[10px] text-slate-400 font-mono truncate">Testado: ${defaultPath}</div>
-              <div class="text-[10px] text-amber-300">Verifique se o arquivo está exatamente em <code class="bg-slate-900 px-1 rounded">${defaultPath}</code> no GitHub.</div>
-            </div>
-          `;
+      // Carrega histórico de séries registradas
+      const savedLogs = localStorage.getItem("irontracker_workout_logs");
+      if (savedLogs) {
+        try {
+          workoutLogs = JSON.parse(savedLogs);
+        } catch (e) {
+          workoutLogs = [];
         }
       }
-
-      html += '</div>';
-      container.innerHTML = html;
     }
 
-    function openExerciseModal(id) {
-      const ex = exercisesDB[id];
+    function saveExercisesToStorage() {
+      localStorage.setItem("irontracker_exercises", JSON.stringify(appExercises));
+    }
+
+    function saveLogsToStorage() {
+      localStorage.setItem("irontracker_workout_logs", JSON.stringify(workoutLogs));
+    }
+
+    // 3. RECUPERAÇÃO DO ÚLTIMO REGISTRO DO EXERCÍCIO
+    function getLastWorkoutForExercise(exerciseId) {
+      const logs = workoutLogs.filter(l => l.exerciseId === exerciseId);
+      if (logs.length === 0) return null;
+      // Retorna o log mais recente
+      return logs[logs.length - 1];
+    }
+
+    // 4. RENDERIZAÇÃO DA LISTA DE EXERCÍCIOS
+    function renderExerciseList() {
+      const container = document.getElementById("exercise-list");
+      document.getElementById("total-count").textContent = appExercises.length;
+
+      const filtered = currentCategory === "todos" 
+        ? appExercises 
+        : appExercises.filter(ex => ex.category === currentCategory);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 bg-slate-900 border border-slate-800 rounded-2xl">
+            <i class="fa-solid fa-dumbbell text-slate-600 text-3xl mb-2"></i>
+            <p class="text-sm font-semibold text-slate-400">Nenhum exercício nesta divisão.</p>
+            <button onclick="openNewExerciseModal()" class="mt-3 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold">Adicionar Agora</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(ex => {
+        const lastLog = getLastWorkoutForExercise(ex.id);
+        const lastWeight = lastLog ? lastLog.weight : "";
+        const lastReps = lastLog ? lastLog.reps : "";
+        const lastDate = lastLog ? new Date(lastLog.timestamp).toLocaleDateString("pt-BR", {day:'2-digit', month:'2-digit'}) : "";
+
+        // Imagem prioritária: Foto personalizada gravada ou caminho relativo da pasta
+        const imgSrc = ex.customBase64 || ex.imagePath || `imagens/${ex.name}.png`;
+
+        return `
+          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 space-y-3 shadow-lg shadow-black/20" id="card-${ex.id}">
+            
+            <!-- TOPO DO CARD: NOME, MÚSCULOS E BOTÃO DE IMAGEM -->
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm font-extrabold text-white">${ex.name}</h3>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                    ${ex.defaultSetsReps || "3-4 séries"}
+                  </span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">${ex.muscle || "Hipertrofia"}</p>
+              </div>
+
+              <!-- MINIATURA CLICÁVEL COM TRATAMENTO DE IMAGEM -->
+              <button onclick="openImageModal('${ex.id}')" class="relative w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex-shrink-0 group hover:border-blue-500 transition">
+                <img 
+                  src="${imgSrc}" 
+                  alt="${ex.name}" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition"
+                  onerror="handleThumbnailFallback(this, '${ex.name}')" 
+                />
+                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                  <i class="fa-solid fa-expand text-white text-xs"></i>
+                </div>
+              </button>
+            </div>
+
+            <!-- BADGE DE MEMÓRIA DA SEMANA ANTERIOR -->
+            <div class="flex items-center justify-between px-3 py-1.5 bg-slate-950/70 border border-slate-800 rounded-xl text-xs">
+              <div class="flex items-center gap-1.5 text-slate-300">
+                <i class="fa-solid fa-clock-rotate-left text-blue-400 text-[11px]"></i>
+                <span class="text-[11px] text-slate-400">Último treino:</span>
+                <strong class="text-white">${lastLog ? `${lastWeight} kg × ${lastReps} reps` : 'Sem registro anterior'}</strong>
+              </div>
+              ${lastLog ? `<span class="text-[10px] font-semibold text-slate-500">${lastDate}</span>` : ''}
+            </div>
+
+            <!-- CAMPOS DE ENTRADA DO TREINO ATUAL -->
+            <div class="grid grid-cols-12 gap-2 items-center pt-1">
+              
+              <div class="col-span-4">
+                <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Carga (kg)</label>
+                <div class="relative">
+                  <input 
+                    type="number" 
+                    id="weight-${ex.id}" 
+                    step="0.5" 
+                    placeholder="${lastWeight || '0'}" 
+                    class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm font-bold text-white text-center focus:outline-none focus:border-blue-500" 
+                  />
+                  <span class="absolute right-2 top-2.5 text-[10px] text-slate-500 font-semibold">kg</span>
+                </div>
+              </div>
+
+              <div class="col-span-4">
+                <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Reps</label>
+                <input 
+                  type="number" 
+                  id="reps-${ex.id}" 
+                  placeholder="${lastReps || '10'}" 
+                  class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm font-bold text-white text-center focus:outline-none focus:border-blue-500" 
+                />
+              </div>
+
+              <div class="col-span-4 flex items-end">
+                <button 
+                  onclick="recordWorkoutSet('${ex.id}', '${ex.name}')" 
+                  class="w-full py-2 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20 transition">
+                  <i class="fa-solid fa-check"></i>
+                  <span>Salvar</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- FEEDBACK DE SUCESSO RÁPIDO -->
+            <div id="feedback-${ex.id}" class="hidden text-center py-1 text-xs font-bold text-emerald-400 bg-emerald-950/30 border border-emerald-800/30 rounded-lg">
+              ✓ Registro gravado com sucesso!
+            </div>
+
+          </div>
+        `;
+      }).join("");
+    }
+
+    // 5. REGISTRAR SÉRIE / TREINO E ATUALIZAR HISTÓRICO
+    function recordWorkoutSet(exerciseId, exerciseName) {
+      const weightInput = document.getElementById(`weight-${exerciseId}`);
+      const repsInput = document.getElementById(`reps-${exerciseId}`);
+
+      const weightVal = parseFloat(weightInput.value);
+      const repsVal = parseInt(repsInput.value);
+
+      if (isNaN(weightVal) || isNaN(repsVal)) {
+        alert("Preencha a carga (kg) e o número de repetições realizadas.");
+        return;
+      }
+
+      const newEntry = {
+        id: "log_" + Date.now(),
+        exerciseId: exerciseId,
+        exerciseName: exerciseName,
+        category: currentCategory,
+        weight: weightVal,
+        reps: repsVal,
+        volume: weightVal * repsVal,
+        timestamp: new Date().toISOString()
+      };
+
+      // Salva no array e na memória permanente do navegador
+      workoutLogs.push(newEntry);
+      saveLogsToStorage();
+
+      // Feedback visual rápido
+      const fb = document.getElementById(`feedback-${exerciseId}`);
+      if (fb) {
+        fb.classList.remove("hidden");
+        setTimeout(() => fb.classList.add("hidden"), 2000);
+      }
+
+      // Inicia cronômetro automático de 90 segundos entre séries
+      startTimer(90);
+
+      // Re-renderiza para atualizar a badge "Último treino" imediatamente
+      renderExerciseList();
+      populateHistoryFilter();
+    }
+
+    // 6. TRATAMENTO DE IMAGENS & FALLBACKS DINÂMICOS
+    function handleThumbnailFallback(imgElement, exerciseName) {
+      // Se a pasta 'imagens/' falhar, tenta na raiz ou gera um avatar visual elegante
+      const encodedName = encodeURIComponent(exerciseName);
+      imgElement.onerror = () => {
+        // Fallback final: Box elegante com ícone para nunca ficar quebrado
+        imgElement.parentElement.innerHTML = `
+          <div class="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-1 text-center">
+            <i class="fa-solid fa-dumbbell text-sm text-blue-500 mb-0.5"></i>
+            <span class="text-[8px] font-bold leading-tight text-slate-400 truncate w-full">${exerciseName}</span>
+          </div>
+        `;
+      };
+      imgElement.src = `imagens/${exerciseName}.png`;
+    }
+
+    // 7. MODAL DE IMAGEM & INSTRUÇÕES
+    function openImageModal(exerciseId) {
+      const ex = appExercises.find(e => e.id === exerciseId);
       if (!ex) return;
+      activeModalEx = ex;
 
-      currentModalExerciseId = id;
-      document.getElementById('modal-category').innerText = `Treino ${ex.workout.toUpperCase()} • ${ex.category}`;
-      document.getElementById('modal-title').innerText = ex.name;
-      document.getElementById('modal-safety').innerText = ex.safety;
+      document.getElementById("modal-title").textContent = ex.name;
+      document.getElementById("modal-subtitle").textContent = ex.muscle || "Biomecânica e Execução";
+      document.getElementById("modal-desc").textContent = ex.instructions || "Execute com ritmo controlado, mantendo a postura firme e sem balanço.";
 
-      const imgEl = document.getElementById('modal-image');
-      imgEl.setAttribute('data-ex-id', id);
-      imgEl.setAttribute('data-attempt', '0');
-      imgEl.src = getExerciseImage(id);
+      const modalImg = document.getElementById("modal-img");
+      const targetSrc = ex.customBase64 || ex.imagePath || `imagens/${ex.name}.png`;
+      modalImg.src = targetSrc;
+      modalImg.onerror = () => {
+        modalImg.src = `https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop&q=80`;
+      };
 
-      // Render muscles badges
-      const musclesContainer = document.getElementById('modal-muscles');
-      musclesContainer.innerHTML = ex.muscles.map(m => `
-        <span class="bg-slate-800 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-slate-700">
-          ${m}
-        </span>
-      `).join('');
-
-      // Render steps
-      const stepsContainer = document.getElementById('modal-steps');
-      stepsContainer.innerHTML = ex.steps.map(s => `<li>${s}</li>`).join('');
-
-      document.getElementById('exercise-modal').classList.remove('hidden');
+      const modal = document.getElementById("image-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
     }
 
-    function closeExerciseModal() {
-      document.getElementById('exercise-modal').classList.add('hidden');
-      currentModalExerciseId = null;
+    function closeImageModal() {
+      const modal = document.getElementById("image-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      activeModalEx = null;
     }
 
-    // Handle Custom User Photo Upload
-    function handleUserPhotoUpload(event) {
-      const file = event.target.files[0];
-      if (!file || !currentModalExerciseId) return;
-
+    // UPLOAD DIRETO DE FOTO PELO CELULAR DENTRO DO MODAL
+    function uploadCustomImageForModal(fileInput) {
+      if (!fileInput.files || !fileInput.files[0] || !activeModalEx) return;
+      const file = fileInput.files[0];
       const reader = new FileReader();
       reader.onload = function(e) {
-        const base64Img = e.target.result;
-        try {
-          localStorage.setItem(`custom_img_${currentModalExerciseId}`, base64Img);
-          document.getElementById('modal-image').src = base64Img;
-          renderWorkoutExercises();
-          renderGallery('all');
-        } catch (err) {
-          console.warn("Storage quota limit reached for local images", err);
-        }
+        const base64Data = e.target.result;
+        // Salva direto no objeto do exercício
+        activeModalEx.customBase64 = base64Data;
+        saveExercisesToStorage();
+        document.getElementById("modal-img").src = base64Data;
+        renderExerciseList();
+        alert(`Imagem de "${activeModalEx.name}" atualizada e salva permanentemente no seu app!`);
       };
       reader.readAsDataURL(file);
     }
 
-    function renderGallery(filter) {
-      const grid = document.getElementById('gallery-grid');
-      let keys = Object.keys(exercisesDB);
+    // 8. CADASTRAR NOVO EXERCÍCIO
+    function openNewExerciseModal() {
+      document.getElementById("new-exercise-modal").classList.remove("hidden");
+      document.getElementById("new-exercise-modal").classList.add("flex");
+    }
 
-      if (filter !== 'all') {
-        keys = keys.filter(k => exercisesDB[k].workout === filter);
+    function closeNewExerciseModal() {
+      document.getElementById("new-exercise-modal").classList.add("hidden");
+      document.getElementById("new-exercise-modal").classList.remove("flex");
+    }
+
+    function saveNewExercise() {
+      const name = document.getElementById("new-ex-name").value.trim();
+      const cat = document.getElementById("new-ex-cat").value;
+      const setsReps = document.getElementById("new-ex-sets").value.trim();
+      const muscle = document.getElementById("new-ex-muscle").value.trim();
+      const filename = document.getElementById("new-ex-img-filename").value.trim();
+      const desc = document.getElementById("new-ex-desc").value.trim();
+      const fileInput = document.getElementById("new-ex-img-file");
+
+      if (!name) {
+        alert("Por favor, digite o nome do exercício.");
+        return;
       }
 
-      let html = '';
-      keys.forEach(key => {
-        const ex = exercisesDB[key];
-        const imgSrc = getExerciseImage(key);
+      const newId = "ex_" + Date.now();
+      const imagePath = filename ? (filename.startsWith("imagens/") ? filename : `imagens/${filename}`) : `imagens/${name}.png`;
 
-        html += `
-          <div onclick="openExerciseModal('${key}')" class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden cursor-pointer hover:border-cyan-500 transition group p-2">
-            <div class="w-full h-28 bg-slate-900 rounded-lg overflow-hidden relative mb-2 flex items-center justify-center">
-              <img src="${imgSrc}" alt="${ex.name}" data-ex-id="${key}" data-attempt="0" class="w-full h-full object-contain group-hover:scale-105 transition duration-300" onerror="handleImageError(this)">
-              <span class="absolute top-1.5 left-1.5 bg-black/70 text-[9px] font-bold text-white px-1.5 py-0.5 rounded border border-white/10 uppercase">
-                ${ex.workout}
-              </span>
-            </div>
-            <h5 class="text-xs font-bold text-white truncate leading-tight group-hover:text-cyan-400">${ex.name}</h5>
-            <div class="text-[10px] text-slate-400 mt-0.5 truncate">${ex.category.split('•')[0]}</div>
+      const createAndSave = (customBase64 = null) => {
+        const newObj = {
+          id: newId,
+          name: name,
+          category: cat,
+          defaultSetsReps: setsReps || "3 x 10-12",
+          muscle: muscle || "Geral",
+          imagePath: imagePath,
+          instructions: desc || "Mantenha a postura controlada e foco na contração muscular.",
+          customBase64: customBase64
+        };
+
+        appExercises.push(newObj);
+        saveExercisesToStorage();
+        closeNewExerciseModal();
+        
+        // Limpa campos
+        document.getElementById("new-ex-name").value = "";
+        document.getElementById("new-ex-sets").value = "";
+        document.getElementById("new-ex-muscle").value = "";
+        document.getElementById("new-ex-img-filename").value = "";
+        document.getElementById("new-ex-desc").value = "";
+        fileInput.value = "";
+
+        // Se estiver em outra aba, vai para a categoria do exercício criado
+        currentCategory = cat;
+        updateCategoryButtonsUI();
+        renderExerciseList();
+        populateHistoryFilter();
+        alert(`Exercício "${name}" adicionado com sucesso!`);
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => createAndSave(e.target.result);
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        createAndSave(null);
+      }
+    }
+
+    // 9. NAVEGAÇÃO ENTRE ABAS
+    function switchTab(tab) {
+      document.getElementById("view-treino").classList.toggle("hidden", tab !== "treino");
+      document.getElementById("view-historico").classList.toggle("hidden", tab !== "historico");
+      document.getElementById("view-nutricao").classList.toggle("hidden", tab !== "nutricao");
+
+      const tabs = ["treino", "historico", "nutricao"];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tab) {
+          btn.className = "flex flex-col items-center gap-1 text-blue-400 py-1 transition";
+        } else {
+          btn.className = "flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 py-1 transition";
+        }
+      });
+
+      if (tab === "historico") renderHistoryView();
+    }
+
+    function switchCategory(cat) {
+      currentCategory = cat;
+      updateCategoryButtonsUI();
+      renderExerciseList();
+    }
+
+    function updateCategoryButtonsUI() {
+      const cats = ["push", "pull", "legs", "outros", "todos"];
+      cats.forEach(c => {
+        const btn = document.getElementById(`cat-${c}`);
+        if (!btn) return;
+        if (c === currentCategory) {
+          btn.className = "cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-md shadow-blue-600/25 transition";
+        } else {
+          btn.className = "cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition";
+        }
+      });
+    }
+
+    // 10. ABA DE HISTÓRICO DETALHADO
+    function populateHistoryFilter() {
+      const select = document.getElementById("filter-history-exercise");
+      if (!select) return;
+      const currentVal = select.value;
+
+      select.innerHTML = '<option value="all">Ver Todos os Exercícios</option>';
+      appExercises.forEach(ex => {
+        const opt = document.createElement("option");
+        opt.value = ex.id;
+        opt.textContent = ex.name;
+        select.appendChild(opt);
+      });
+      select.value = currentVal || "all";
+    }
+
+    function renderHistoryView() {
+      const container = document.getElementById("history-container");
+      const filterVal = document.getElementById("filter-history-exercise").value;
+
+      let filtered = [...workoutLogs].reverse();
+      if (filterVal !== "all") {
+        filtered = filtered.filter(l => l.exerciseId === filterVal);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 text-xs">
+            Nenhum registro encontrado. Complete suas séries na aba Treinos para acompanhar o histórico aqui!
           </div>
         `;
-      });
-
-      grid.innerHTML = html;
-    }
-
-    function filterGallery(filter) {
-      document.querySelectorAll('.gallery-filter-btn').forEach(btn => {
-        btn.className = "gallery-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 flex-shrink-0";
-      });
-      event.target.className = "gallery-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-cyan-600 text-white flex-shrink-0";
-      renderGallery(filter);
-    }
-
-    function saveExerciseLog(id, field, value) {
-      localStorage.setItem(`${field}_${id}`, value);
-    }
-
-    function toggleExerciseDone(id) {
-      const current = localStorage.getItem(`done_${id}`) === 'true';
-      const next = !current;
-      localStorage.setItem(`done_${id}`, next);
-
-      if (next) {
-        startRest(90);
+        return;
       }
-      renderWorkoutExercises();
+
+      container.innerHTML = filtered.map(log => {
+        const d = new Date(log.timestamp);
+        const dataFormatada = d.toLocaleDateString("pt-BR", { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs font-bold text-white">${log.exerciseName}</div>
+              <div class="text-[11px] text-slate-400">${dataFormatada}</div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span class="text-sm font-extrabold text-blue-400">${log.weight} kg</span>
+                <span class="text-xs text-slate-400"> × ${log.reps} reps</span>
+                <span class="text-[10px] block text-slate-500">Vol: ${log.volume || (log.weight * log.reps)} kg</span>
+              </div>
+              <button onclick="deleteLogEntry('${log.id}')" class="text-slate-600 hover:text-rose-400 p-1">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
     }
 
-    // Beep sound with Web Audio API
+    function deleteLogEntry(logId) {
+      if (!confirm("Deseja apagar este registro de série?")) return;
+      workoutLogs = workoutLogs.filter(l => l.id !== logId);
+      saveLogsToStorage();
+      renderHistoryView();
+      renderExerciseList();
+    }
+
+    function clearHistoryConfirm() {
+      if (!confirm("Tem certeza que deseja apagar TODO o histórico de treinos?")) return;
+      workoutLogs = [];
+      saveLogsToStorage();
+      renderHistoryView();
+      renderExerciseList();
+    }
+
+    // 11. CRONÔMETRO DE DESCANSO
+    function startTimer(duration) {
+      clearInterval(timerInterval);
+      timerSeconds = duration;
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timerSeconds--;
+        updateTimerDisplay();
+
+        if (timerSeconds <= 0) {
+          clearInterval(timerInterval);
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          playBeep();
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerSeconds = 0;
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const min = Math.floor(timerSeconds / 60);
+      const sec = timerSeconds % 60;
+      document.getElementById("timer-display").textContent = 
+        `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    }
+
     function playBeep() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
+        osc.frequency.value = 587.33; // D5
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
-      } catch (e) {
-        // AudioContext not permitted or blocked
-      }
+        setTimeout(() => { osc.stop(); }, 250);
+      } catch (e) {}
     }
 
-    function startRest(seconds) {
-      clearInterval(timerInterval);
-      timerSeconds = seconds;
-      updateTimerUI();
+    // 12. CHECKLIST NUTRICIONAL
+    function renderMealsChecklist() {
+      const meals = [
+        { id: "m1", title: "Café da Manhã (~600 kcal)", desc: "3 ovos + 2 fatias de pão integral + 1 banana com aveia" },
+        { id: "m2", title: "Almoço (~850 kcal)", desc: "180g arroz + 100g feijão + 180g frango/carne + salada" },
+        { id: "m3", title: "Lanche / Pré-Treino (~450 kcal)", desc: "Shake com 1 scoop Whey + 1 banana + aveia / pasta de amendoim" },
+        { id: "m4", title: "Jantar (~800 kcal)", desc: "200g batata ou arroz + 180g carne/peixe + vegetais" },
+        { id: "m5", title: "Ceia (~300 kcal)", desc: "Iogurte com castanhas ou fruta" }
+      ];
 
-      timerInterval = setInterval(() => {
-        timerSeconds--;
-        updateTimerUI();
-        if (timerSeconds <= 0) {
-          clearInterval(timerInterval);
-          playBeep();
-          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        }
-      }, 1000);
-    }
-
-    function stopRest() {
-      clearInterval(timerInterval);
-      timerSeconds = 0;
-      updateTimerUI();
-    }
-
-    function updateTimerUI() {
-      const mins = Math.floor(timerSeconds / 60);
-      const secs = timerSeconds % 60;
-      document.getElementById('timer-text').innerText = 
-        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function addWater(amount) {
-      waterCurrent = Math.min(waterGoal, waterCurrent + amount);
-      updateWaterUI();
-      localStorage.setItem('water_ml', waterCurrent);
-    }
-
-    function resetWater() {
-      waterCurrent = 0;
-      updateWaterUI();
-      localStorage.setItem('water_ml', waterCurrent);
-    }
-
-    function updateWaterUI() {
-      document.getElementById('water-text').innerText = `${waterCurrent} / ${waterGoal} ml`;
-      const pct = Math.min(100, (waterCurrent / waterGoal) * 100);
-      document.getElementById('water-bar').style.width = `${pct}%`;
-    }
-
-    function loadSavedWater() {
-      const saved = localStorage.getItem('water_ml');
-      if (saved) {
-        waterCurrent = parseInt(saved, 10);
-        updateWaterUI();
-      }
-    }
-
-    function toggleMealCheck(idx, checked) {
-      localStorage.setItem(`meal_chk_${idx}`, checked ? 'true' : 'false');
-    }
-
-    function loadSavedMeals() {
-      for (let i = 1; i <= 5; i++) {
-        const isChecked = localStorage.getItem(`meal_chk_${i}`) === 'true';
-        const el = document.getElementById(`chk-meal-${i}`);
-        if (el) el.checked = isChecked;
-      }
-    }
-
-    function loadWeightHistory() {
-      const history = JSON.parse(localStorage.getItem('weight_history') || '[]');
-      const list = document.getElementById('weight-history-list');
-
-      if (history.length === 0) {
-        list.innerHTML = `
-          <li class="flex justify-between pt-1">
-            <span class="text-slate-400">Semana 1 (Início)</span>
-            <span class="font-bold text-white">78.0 kg</span>
-          </li>
-          <li class="flex justify-between pt-1">
-            <span class="text-slate-400">Semana 2</span>
-            <span class="font-bold text-emerald-400">78.4 kg (+400g)</span>
-          </li>
-        `;
-        return;
-      }
-
-      list.innerHTML = history.map(item => `
-        <li class="flex justify-between pt-1">
-          <span class="text-slate-400">${item.date}</span>
-          <span class="font-bold text-emerald-400">${item.weight} kg</span>
-        </li>
-      `).join('');
-    }
-
-    function promptNewWeight() {
-      const weightVal = prompt("Digite seu peso em jejum hoje (ex: 78.8):");
-      if (weightVal && !isNaN(parseFloat(weightVal))) {
-        const history = JSON.parse(localStorage.getItem('weight_history') || '[]');
-        const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        history.unshift({
-          date: `Pesagem (${today})`,
-          weight: parseFloat(weightVal).toFixed(1)
-        });
-        localStorage.setItem('weight_history', JSON.stringify(history));
-        loadWeightHistory();
-      }
-    }
-
-    // Complementary Activities Modal
-    function openInfoModal(type) {
-      const modal = document.getElementById('info-modal');
-      const title = document.getElementById('info-modal-title');
-      const content = document.getElementById('info-modal-content');
-
-      if (type === 'corrida') {
-        title.innerHTML = `<i class="fa-solid fa-person-running text-amber-400 mr-2"></i> Corrida Leve (Zona 2)`;
-        content.innerHTML = `
-          <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50">
-            <strong class="text-white block mb-1">Como correr sem perder massa muscular:</strong>
-            <p>Faça de 20 a 30 minutos em ritmo conversacional (Zona 2: onde você consegue falar sem perder o fôlego).</p>
+      const container = document.getElementById("meals-checklist");
+      container.innerHTML = meals.map(m => `
+        <label class="flex items-start gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition">
+          <input type="checkbox" class="mt-1 w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0" />
+          <div class="flex-1">
+            <div class="text-xs font-bold text-white">${m.title}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">${m.desc}</div>
           </div>
-          <ul class="list-disc list-inside space-y-1.5 text-slate-300">
-            <li><strong>Melhor dia:</strong> Em dias sem musculação ou com pelo menos 6h de distância do treino de pernas.</li>
-            <li><strong>Benefício:</strong> Aumenta a capilarização periférica e acelera o transporte de nutrientes aos músculos.</li>
-            <li><strong>Dica:</strong> Beba água antes e tome um shake com carboidrato ao terminar.</li>
-          </ul>
-        `;
-      } else {
-        title.innerHTML = `<i class="fa-solid fa-basketball text-orange-400 mr-2"></i> Basquete & Gestão de Pernas`;
-        content.innerHTML = `
-          <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50">
-            <strong class="text-white block mb-1">Impacto articular e saltos:</strong>
-            <p>O basquete exige sprints e saltos que demandam muito dos quadríceps, tendões e panturrilha.</p>
-          </div>
-          <ul class="list-disc list-inside space-y-1.5 text-slate-300">
-            <li><strong>Regra de Ouro:</strong> Se jogou basquete forte (1h+), descanse as pernas e pule o <em>Treino C</em> dessa semana ou reduza o volume.</li>
-            <li><strong>Combustível:</strong> Acrescente 40g a 50g extras de carboidrato para recuperar o glicogênio gasto nas corridas.</li>
-            <li><strong>Proteção:</strong> Faça o exercício <em>Wall Sit</em> (agachamento isométrico na parede) no dia seguinte para desinflamar o tendão patelar.</li>
-          </ul>
-        `;
-      }
-
-      modal.classList.remove('hidden');
-    }
-
-    function closeInfoModal() {
-      document.getElementById('info-modal').classList.add('hidden');
+        </label>
+      `).join("");
     }
   </script>
 </body>
