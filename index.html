@@ -172,6 +172,17 @@
         <span id="workout-stats-badge" class="text-xs text-slate-400 font-medium">5 exercícios</span>
       </div>
 
+      <!-- GitHub Folder Notice Card -->
+      <div class="bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-slate-900 border border-blue-500/30 rounded-xl p-3 text-xs flex items-start gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <i class="fa-solid fa-folder-open text-xs"></i>
+        </div>
+        <div class="flex-1 text-[11px] leading-relaxed text-slate-300">
+          <span class="font-bold text-white block mb-0.5">Pasta <code class="text-cyan-300 bg-slate-950 px-1 py-0.5 rounded border border-slate-800">imagens/</code> integrada</span>
+          O app busca automaticamente seus arquivos: <span class="text-cyan-300 font-semibold">flexao</span>, <span class="text-cyan-300 font-semibold">Tríceps</span>, <span class="text-cyan-300 font-semibold">Crucifixo</span>, <span class="text-cyan-300 font-semibold">Desenvolvimento com Halteres</span> e <span class="text-cyan-300 font-semibold">Supino</span> (formatos .jpg, .png, .jpeg ou .webp).
+        </div>
+      </div>
+
       <div id="exercises-container" class="space-y-3.5">
         <!-- Rendered dynamically via JavaScript -->
       </div>
@@ -559,8 +570,9 @@
     }
 
     // High quality, direct gym photo references with instant guaranteed fallbacks
+    // Configured to prioritize the user's "imagens/" folder matching exact requested filenames
     const exercisesDB = {
-      // PUSH
+      // PUSH - Exactly mapped to the requested filenames in folder 'imagens/'
       supino_reto: {
         id: "supino_reto",
         name: "Supino Reto com Barra",
@@ -569,7 +581,8 @@
         series: "4 séries",
         reps: "6 a 10 reps",
         rest: "90s - 120s",
-        img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Supino", "imagens/supino"],
+        img: "imagens/Supino.jpg",
         muscles: ["Peitoral Maior", "Tríceps Braquial", "Deltoide Anterior"],
         steps: [
           "Deite no banco com os olhos alinhados diretamente abaixo da barra.",
@@ -587,7 +600,8 @@
         series: "3 séries",
         reps: "8 a 12 reps",
         rest: "90s",
-        img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Desenvolvimento com Halteres", "imagens/desenvolvimento com halteres", "imagens/desenvolvimento-com-halteres"],
+        img: "imagens/Desenvolvimento com Halteres.jpg",
         muscles: ["Deltoide Anterior", "Deltoide Lateral", "Tríceps Braquial", "Trapézio"],
         steps: [
           "Sentado no banco com apoio nas costas, comece com os halteres na altura dos ombros.",
@@ -599,13 +613,14 @@
       },
       crucifixo_halteres: {
         id: "crucifixo_halteres",
-        name: "Crucifixo com Halteres no Banco Reto",
+        name: "Crucifixo com Halteres",
         category: "Isolamento de Peitoral • Alongamento Máximo",
         workout: "push",
         series: "3 séries",
         reps: "10 a 12 reps",
         rest: "75s",
-        img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Crucifixo", "imagens/crucifixo"],
+        img: "imagens/Crucifixo.jpg",
         muscles: ["Peitoral Maior", "Deltoide Anterior", "Bíceps (Estabilizador)"],
         steps: [
           "Deitado no banco reto com um halter em cada mão apontando para cima.",
@@ -623,7 +638,8 @@
         series: "3 séries",
         reps: "10 a 15 reps",
         rest: "60s",
-        img: "https://images.unsplash.com/photo-1530822847156-5df684ec5ee1?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Tríceps", "imagens/triceps", "imagens/Triceps", "imagens/tríceps"],
+        img: "imagens/Tríceps.jpg",
         muscles: ["Tríceps Braquial", "Ancôneo", "Extensores do Punho"],
         steps: [
           "Tronco levemente inclinado à frente com cotovelos colados ao lado da caixa torácica.",
@@ -635,13 +651,14 @@
       },
       flexao_braco: {
         id: "flexao_braco",
-        name: "Flexão de Braço (Push-Up)",
+        name: "Flexão de Braço",
         category: "Finalizador de Volume • Peitoral e Core",
         workout: "push",
         series: "3 séries",
         reps: "Até a falha técnica",
         rest: "60s",
-        img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/flexao", "imagens/Flexao", "imagens/flexão", "imagens/Flexão"],
+        img: "imagens/flexao.jpg",
         muscles: ["Peitoral Maior", "Core Abdominal", "Deltoide Anterior", "Tríceps"],
         steps: [
           "Posicione as mãos um pouco mais largas que a linha dos ombros.",
@@ -661,7 +678,8 @@
         series: "4 séries",
         reps: "6 a 10 reps",
         rest: "90s - 120s",
-        img: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Puxada", "imagens/puxada"],
+        img: "imagens/Puxada.jpg",
         muscles: ["Latissimus Dorsi (Grande Dorsal)", "Redondo Maior", "Bíceps Braquial", "Romboides"],
         steps: [
           "Ajuste a almofada da coxa para fixar firmemente o corpo no banco.",
@@ -679,7 +697,8 @@
         series: "4 séries",
         reps: "8 a 12 reps",
         rest: "90s",
-        img: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Remada Curvada", "imagens/remada-curvada", "imagens/remada"],
+        img: "imagens/Remada Curvada.jpg",
         muscles: ["Trapézio Médio/Inferior", "Romboides", "Dorsais", "Deltoide Posterior", "Eretores"],
         steps: [
           "Com os joelhos destravados, incline o tronco mantendo as costas retas e o peito aberto.",
@@ -697,7 +716,8 @@
         series: "3 séries",
         reps: "10 a 12 reps cada lado",
         rest: "75s",
-        img: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Remada Unilateral", "imagens/serrote"],
+        img: "imagens/Remada Unilateral.jpg",
         muscles: ["Grande Dorsal", "Romboides", "Deltoide Posterior", "Bíceps"],
         steps: [
           "Apoie um joelho e a mão do mesmo lado sobre o banco reto.",
@@ -715,7 +735,8 @@
         series: "3 séries",
         reps: "8 a 12 reps",
         rest: "60s",
-        img: "https://images.unsplash.com/photo-1581009146147-975971a93809?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Rosca Direta", "imagens/rosca-direta", "imagens/biceps"],
+        img: "imagens/Rosca Direta.jpg",
         muscles: ["Bíceps Braquial (Cabeça Curta & Longa)", "Braquial Anterior", "Braquiorradial"],
         steps: [
           "Em pé com postura ereta e pés na largura dos ombros.",
@@ -735,7 +756,8 @@
         series: "4 séries",
         reps: "6 a 10 reps",
         rest: "120s",
-        img: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Agachamento", "imagens/agachamento"],
+        img: "imagens/Agachamento.jpg",
         muscles: ["Quadríceps Femoral", "Glúteo Máximo", "Adutores", "Eretores da Espinha"],
         steps: [
           "Apoie a barra firme sobre a musculatura do trapézio e tire do suporte.",
@@ -753,7 +775,8 @@
         series: "4 séries",
         reps: "8 a 12 reps",
         rest: "90s",
-        img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Terra Romeno", "imagens/terra-romeno", "imagens/rdl"],
+        img: "imagens/Terra Romeno.jpg",
         muscles: ["Isquiotibiais", "Glúteo Máximo", "Eretores da Coluna"],
         steps: [
           "Segure a barra com pegada pronada na largura das pernas.",
@@ -771,7 +794,8 @@
         series: "3 séries",
         reps: "10 a 12 reps",
         rest: "90s",
-        img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Leg Press", "imagens/leg-press"],
+        img: "imagens/Leg Press.jpg",
         muscles: ["Quadríceps", "Glúteo Máximo", "Panturrilhas"],
         steps: [
           "Acomode a lombar e os glúteos completamente colados no encosto.",
@@ -789,7 +813,8 @@
         series: "3 séries",
         reps: "12 a 15 reps",
         rest: "60s",
-        img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Cadeira Extensora", "imagens/extensora"],
+        img: "imagens/Cadeira Extensora.jpg",
         muscles: ["Quadríceps Femoral (Reto Femoral, Vasto Lateral, Medial e Intermédio)"],
         steps: [
           "Ajuste o encosto de modo que o joelho fique no mesmo eixo de rotação da máquina.",
@@ -807,7 +832,8 @@
         series: "4 séries",
         reps: "15 a 20 reps",
         rest: "60s",
-        img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Panturrilha", "imagens/panturrilha"],
+        img: "imagens/Panturrilha.jpg",
         muscles: ["Gastrocnêmio", "Sóleo", "Tibial Posterior"],
         steps: [
           "Apoie a ponta dos pés em um degrau ou step segurando um halter firme em cada mão.",
@@ -827,7 +853,8 @@
         series: "3 séries",
         reps: "35 a 45 segundos",
         rest: "60s",
-        img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Wall Sit", "imagens/wall-sit"],
+        img: "imagens/Wall Sit.jpg",
         muscles: ["Quadríceps", "Estabilizadores do Joelho", "Glúteos"],
         steps: [
           "Apoie as costas retas na parede e deslize até os joelhos ficarem em ângulo de 90°.",
@@ -845,7 +872,8 @@
         series: "3 séries",
         reps: "10 a 12 reps cada perna",
         rest: "75s",
-        img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80",
+        imgBaseNames: ["imagens/Step Up", "imagens/step-up"],
+        img: "imagens/Step Up.jpg",
         muscles: ["Glúteo Máximo", "Quadríceps", "Panturrilhas"],
         steps: [
           "Pise com todo o pé sobre a caixa ou banco estável.",
@@ -879,12 +907,32 @@
       renderGallery('all');
     });
 
-    // Handle Image Error Gracefully with custom SVG
+    // Intelligent image resolver with multi-extension fallbacks for GitHub repos
+    // Tests: .jpg -> .png -> .jpeg -> .webp -> alternate case -> clean fallback SVG
     function handleImageError(imgElement) {
-      const exerciseId = imgElement.getAttribute('data-ex-id') || 'Treino';
+      const exerciseId = imgElement.getAttribute('data-ex-id');
       const ex = exercisesDB[exerciseId];
-      const title = ex ? ex.name : 'Exercício';
-      imgElement.src = generateFallbackSVG(title, '#38bdf8');
+      if (!ex) return;
+
+      const formats = ['.jpg', '.png', '.jpeg', '.webp', '.JPG', '.PNG'];
+      let attempt = parseInt(imgElement.getAttribute('data-attempt') || '0', 10);
+      const baseNames = ex.imgBaseNames || [`imagens/${ex.name}`];
+
+      // Calculate total potential variants
+      const totalCombinations = baseNames.length * formats.length;
+
+      if (attempt < totalCombinations) {
+        const nameIdx = Math.floor(attempt / formats.length);
+        const formatIdx = attempt % formats.length;
+        const nextSrc = `${baseNames[nameIdx]}${formats[formatIdx]}`;
+
+        imgElement.setAttribute('data-attempt', (attempt + 1).toString());
+        imgElement.src = nextSrc;
+      } else {
+        // All folder extensions attempted; render fallback anatomical vector cleanly
+        imgElement.onerror = null;
+        imgElement.src = generateFallbackSVG(ex.name, '#38bdf8');
+      }
     }
 
     // Tab Switching Logic
@@ -956,7 +1004,7 @@
             <div class="flex items-center gap-3">
               <!-- Exercise Image Thumbnail -->
               <div onclick="openExerciseModal('${id}')" class="w-20 h-20 bg-slate-950 rounded-xl overflow-hidden border border-slate-700/80 flex-shrink-0 cursor-pointer relative group flex items-center justify-center p-0.5">
-                <img src="${imgSrc}" alt="${ex.name}" data-ex-id="${id}" class="w-full h-full object-cover rounded-lg group-hover:scale-105 transition duration-300" onerror="handleImageError(this)">
+                <img src="${imgSrc}" alt="${ex.name}" data-ex-id="${id}" data-attempt="0" class="w-full h-full object-contain rounded-lg group-hover:scale-105 transition duration-300" onerror="handleImageError(this)">
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition rounded-lg">
                   <i class="fa-solid fa-up-right-and-down-left-from-center text-cyan-400 text-xs"></i>
                 </div>
@@ -1019,6 +1067,7 @@
 
       const imgEl = document.getElementById('modal-image');
       imgEl.setAttribute('data-ex-id', id);
+      imgEl.setAttribute('data-attempt', '0');
       imgEl.src = getExerciseImage(id);
 
       // Render muscles badges
@@ -1055,7 +1104,6 @@
           renderWorkoutExercises();
           renderGallery('all');
         } catch (err) {
-          // If storage quota exceeded, alert subtly without native alert
           console.warn("Storage quota limit reached for local images", err);
         }
       };
@@ -1077,8 +1125,8 @@
 
         html += `
           <div onclick="openExerciseModal('${key}')" class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden cursor-pointer hover:border-cyan-500 transition group p-2">
-            <div class="w-full h-28 bg-slate-900 rounded-lg overflow-hidden relative mb-2">
-              <img src="${imgSrc}" alt="${ex.name}" data-ex-id="${key}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleImageError(this)">
+            <div class="w-full h-28 bg-slate-900 rounded-lg overflow-hidden relative mb-2 flex items-center justify-center">
+              <img src="${imgSrc}" alt="${ex.name}" data-ex-id="${key}" data-attempt="0" class="w-full h-full object-contain group-hover:scale-105 transition duration-300" onerror="handleImageError(this)">
               <span class="absolute top-1.5 left-1.5 bg-black/70 text-[9px] font-bold text-white px-1.5 py-0.5 rounded border border-white/10 uppercase">
                 ${ex.workout}
               </span>
