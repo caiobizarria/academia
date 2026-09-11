@@ -1,985 +1,1030 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>IronPulse Pro — Treino & Cargas</title>
-
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>IronTracker — Treino, Cargas & Guia</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Fonts: Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
-    /* Otimizações críticas para Mobile (iOS Safari & Android Chrome) */
-    html, body {
-      overscroll-behavior-y: none;
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
-    
-    /* Inputs numéricos limpos sem setas nativas bugadas */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
-
-    /* Scrollbar oculta mas fluida */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    /* Animação tátil de toque */
-    .touch-press:active {
-      transform: scale(0.97);
-    }
   </style>
 </head>
-<body class="bg-[#090d16] text-slate-100 min-h-screen pb-28 font-sans antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-36">
 
-  <!-- TOP APP BAR (Compacta e fixa) -->
-  <header class="sticky top-0 z-40 bg-[#0c121e]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
-    <div class="max-w-md mx-auto flex items-center justify-between">
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+    <div class="max-w-2xl mx-auto flex items-center justify-between gap-2">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-sm shadow-md shadow-cyan-500/20">
-          IP
+        <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+          <i class="fa-solid fa-dumbbell text-lg"></i>
         </div>
         <div>
-          <h1 class="text-sm font-extrabold text-white tracking-tight leading-none">IronPulse Pro</h1>
-          <span class="text-[10px] text-slate-400 font-medium">Progressão de Cargas & Guia</span>
+          <h1 class="text-base font-extrabold text-white leading-tight">IronTracker</h1>
+          <p class="text-[11px] text-slate-400">Memória de Cargas & Guia</p>
         </div>
       </div>
-
-      <!-- Quick Add Exercise Button -->
-      <button type="button" onclick="openNewExerciseModal()" class="touch-press px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-cyan-600/25">
-        <i class="fa-solid fa-plus text-[11px]"></i>
-        <span>Novo</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button onclick="finishTodayWorkout()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition">
+          <i class="fa-solid fa-flag-checkered"></i>
+          <span>Finalizar Treino</span>
+        </button>
+        <button onclick="openNewExerciseModal()" class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-xs active:scale-95 hover:bg-slate-700">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- CONTEÚDO PRINCIPAL (Mobile Container) -->
-  <main class="max-w-md mx-auto px-4 pt-3.5 space-y-4">
-
-    <!-- ========================================== -->
-    <!-- TAB 1: TREINOS (PUSH, PULL, LEGS) -->
-    <!-- ========================================== -->
-    <section id="tab-treinos" class="space-y-3.5">
-      
-      <!-- Seletor de Divisão P/P/L/Outros -->
-      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-        <button type="button" onclick="setWorkoutCategory('push')" id="btn-cat-push" class="touch-press px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 transition">
-          Treino A (Push)
-        </button>
-        <button type="button" onclick="setWorkoutCategory('pull')" id="btn-cat-pull" class="touch-press px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition">
-          Treino B (Pull)
-        </button>
-        <button type="button" onclick="setWorkoutCategory('legs')" id="btn-cat-legs" class="touch-press px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition">
-          Treino C (Legs)
-        </button>
-        <button type="button" onclick="setWorkoutCategory('extra')" id="btn-cat-extra" class="touch-press px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition">
-          Funcional / Core
-        </button>
+  <!-- CRONÔMETRO DE DESCANSO GRANDE (FUNCIONA EM SEGUNDO PLANO COM TIMESTAMP) -->
+  <div class="max-w-2xl mx-auto px-4 pt-3">
+    <div id="timer-box" class="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/40 border border-slate-800 rounded-2xl p-4 shadow-xl shadow-black/40">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Tempo de Descanso</span>
+        </div>
+        <span id="timer-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
+          Inativo
+        </span>
       </div>
 
-      <!-- Cronômetro de Descanso Rápido -->
-      <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-stopwatch"></i>
-          </div>
-          <div>
-            <span class="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block -mb-0.5">Descanso</span>
-            <span id="timer-display" class="font-mono text-base font-black text-cyan-300">00:00</span>
-          </div>
+      <div class="flex items-center justify-between gap-4">
+        <!-- NÚMERO GIGANTE -->
+        <div class="flex items-baseline gap-1">
+          <div id="timer-large-display" class="text-4xl md:text-5xl font-black font-mono text-white tracking-tight">00:00</div>
+          <span class="text-xs text-slate-500 font-semibold">min:seg</span>
         </div>
+
+        <!-- BOTÕES DE CONTROLE RÁPIDO -->
         <div class="flex items-center gap-1.5">
-          <button type="button" onclick="startRestTimer(60)" class="touch-press px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700">60s</button>
-          <button type="button" onclick="startRestTimer(90)" class="touch-press px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700">90s</button>
-          <button type="button" onclick="startRestTimer(120)" class="touch-press px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700">120s</button>
-          <button type="button" onclick="stopRestTimer()" class="touch-press w-8 h-7 rounded-lg bg-rose-950/40 text-rose-400 border border-rose-800/40 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-stop"></i>
+          <button onclick="setAndStartTimer(60)" class="timer-btn px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 active:border-blue-500 text-xs font-bold text-slate-200 active:text-white transition">60s</button>
+          <button onclick="setAndStartTimer(90)" class="timer-btn px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 active:border-blue-500 text-xs font-bold text-slate-200 active:text-white transition">90s</button>
+          <button onclick="setAndStartTimer(120)" class="timer-btn px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 active:border-blue-500 text-xs font-bold text-slate-200 active:text-white transition">120s</button>
+          <button onclick="stopTimerManual()" title="Parar" class="w-9 h-9 rounded-xl bg-rose-950/40 border border-rose-800/50 text-rose-400 active:scale-95 flex items-center justify-center transition">
+            <i class="fa-solid fa-stop text-sm"></i>
           </button>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Lista de Cards de Exercícios -->
-      <div id="exercises-container" class="space-y-3">
-        <!-- Renderizado dinamicamente via JS -->
-      </div>
-    </section>
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="max-w-2xl mx-auto px-4 pt-4">
 
-    <!-- ========================================== -->
-    <!-- TAB 2: HISTÓRICO DE SÉRIES -->
-    <!-- ========================================== -->
-    <section id="tab-historico" class="space-y-3.5 hidden">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-base font-extrabold text-white">Histórico de Cargas</h2>
-          <p class="text-[11px] text-slate-400">Progresso registrado no seu celular</p>
-        </div>
-        <button type="button" onclick="clearAllLogsPrompt()" class="touch-press text-[11px] font-bold text-rose-400 px-2.5 py-1 bg-rose-950/30 border border-rose-800/40 rounded-lg">
-          Limpar Tudo
+    <!-- VIEW: TREINO ATUAL -->
+    <section id="view-treino" class="space-y-4">
+      
+      <!-- SELETOR DE DIVISÃO -->
+      <div class="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+        <button onclick="switchCategory('push')" id="cat-push" class="cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-blue-600 text-white shadow-md shadow-blue-600/25 transition">
+          Treino A (Push)
+        </button>
+        <button onclick="switchCategory('pull')" id="cat-pull" class="cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition">
+          Treino B (Pull)
+        </button>
+        <button onclick="switchCategory('legs')" id="cat-legs" class="cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition">
+          Treino C (Legs)
+        </button>
+        <button onclick="switchCategory('outros')" id="cat-outros" class="cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition">
+          Funcional / Core
+        </button>
+        <button onclick="switchCategory('todos')" id="cat-todos" class="cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition">
+          Todos (<span id="total-count">0</span>)
         </button>
       </div>
 
-      <!-- Filtro por Exercício -->
+      <!-- LISTA DE CARDS DE EXERCÍCIOS -->
+      <div id="exercise-list" class="space-y-4">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+
+      <!-- BOTÃO DE FINALIZAR NO FINAL DA LISTA -->
+      <div class="pt-2 pb-6">
+        <button onclick="finishTodayWorkout()" class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 transition">
+          <i class="fa-solid fa-check-double text-base"></i>
+          <span>FINALIZAR TREINO DE HOJE</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW: HISTÓRICO GERAL & TREINOS FINALIZADOS -->
+    <section id="view-historico" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-extrabold text-white">Histórico Completo</h2>
+          <p class="text-xs text-slate-400">Sessões e séries registradas</p>
+        </div>
+        <button onclick="clearHistoryConfirm()" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-2.5 py-1.5 rounded-lg bg-rose-950/30 border border-rose-800/30 active:scale-95">
+          Limpar
+        </button>
+      </div>
+
+      <!-- RESUMO RÁPIDO -->
+      <div class="grid grid-cols-2 gap-2">
+        <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl">
+          <span class="text-[10px] uppercase font-bold text-slate-400 block">Treinos Concluídos</span>
+          <span id="stat-workouts-count" class="text-xl font-black text-white">0</span>
+        </div>
+        <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl">
+          <span class="text-[10px] uppercase font-bold text-blue-400 block">Total de Séries Salvas</span>
+          <span id="stat-sets-count" class="text-xl font-black text-white">0</span>
+        </div>
+      </div>
+
+      <!-- FILTRO POR EXERCÍCIO -->
       <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl">
-        <label for="history-filter-select" class="text-[11px] font-bold text-slate-400 block mb-1">Filtrar por exercício</label>
-        <select id="history-filter-select" onchange="renderHistoryView()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-          <option value="all">Todos os Exercícios</option>
+        <label class="text-xs font-bold text-slate-400 block mb-1">Filtrar por Exercício</label>
+        <select id="filter-history-exercise" onchange="renderHistoryView()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          <option value="all">Ver Todas as Séries</option>
         </select>
       </div>
 
-      <!-- Lista de Logs -->
-      <div id="history-list" class="space-y-2">
+      <!-- TIMELINE DE REGISTROS -->
+      <div id="history-container" class="space-y-2.5">
         <!-- Renderizado dinamicamente -->
       </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- TAB 3: NUTRIÇÃO (~3.000 KCAL) -->
-    <!-- ========================================== -->
-    <section id="tab-nutricao" class="space-y-3.5 hidden">
-      <!-- Target Calories Card -->
-      <div class="bg-gradient-to-br from-slate-900 to-[#0f172a] border border-cyan-500/20 p-4 rounded-2xl shadow-lg">
-        <div class="flex justify-between items-start mb-3">
+    <!-- VIEW: NUTRIÇÃO (~3.000 kcal) -->
+    <section id="view-nutricao" class="hidden space-y-4">
+      <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/30 border border-slate-800 p-5 rounded-2xl">
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <span class="text-[9px] font-black uppercase tracking-widest text-cyan-400">Meta Diária • Bulking Limpo</span>
-            <h3 class="text-2xl font-black text-white">3.000 <span class="text-xs font-medium text-slate-400">kcal/dia</span></h3>
+            <h2 class="text-base font-bold text-white">Meta Diária de Hipertrofia</h2>
+            <p class="text-xs text-slate-400">Superávit limpo: ~3.000 kcal / dia</p>
           </div>
-          <span class="text-[10px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-full">
-            78kg • 1,86m
-          </span>
+          <span class="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-bold">1,86m • 78kg</span>
         </div>
 
-        <div class="grid grid-cols-3 gap-2 text-center pt-2 border-t border-slate-800">
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-[10px] font-extrabold text-blue-400 block">Proteína</span>
-            <span class="text-sm font-black text-white">160g</span>
-            <span class="text-[9px] text-slate-400 block">~640 kcal</span>
+        <div class="grid grid-cols-3 gap-2 text-center pt-2">
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-blue-400 block">Proteína</span>
+            <span class="text-sm font-extrabold text-white">160g</span>
+            <span class="text-[10px] text-slate-500 block">~640 kcal</span>
           </div>
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-[10px] font-extrabold text-amber-400 block">Carboidrato</span>
-            <span class="text-sm font-black text-white">400g</span>
-            <span class="text-[9px] text-slate-400 block">~1.600 kcal</span>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-amber-400 block">Carbos</span>
+            <span class="text-sm font-extrabold text-white">400g</span>
+            <span class="text-[10px] text-slate-500 block">~1.600 kcal</span>
           </div>
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-[10px] font-extrabold text-rose-400 block">Gorduras</span>
-            <span class="text-sm font-black text-white">85g</span>
-            <span class="text-[9px] text-slate-400 block">~765 kcal</span>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-emerald-400 block">Gordura</span>
+            <span class="text-sm font-extrabold text-white">85g</span>
+            <span class="text-[10px] text-slate-500 block">~780 kcal</span>
           </div>
         </div>
       </div>
 
-      <!-- Guia Visual da Mão (Sem Balança) -->
-      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2">
-        <h4 class="text-xs font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-hand text-amber-400"></i>
-          <span>Guia Rápido da Mão (Sem Balança)</span>
-        </h4>
-        <div class="grid grid-cols-2 gap-2 text-xs pt-1">
-          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-            <div class="font-bold text-slate-200">1 Palma da mão</div>
-            <div class="text-[10px] text-slate-400">~150g Frango ou Carne (30g Proteína)</div>
-          </div>
-          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-            <div class="font-bold text-slate-200">1 Punho fechado</div>
-            <div class="text-[10px] text-slate-400">~100g Arroz cozido ou Batata</div>
-          </div>
-          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-            <div class="font-bold text-slate-200">1 Polegar</div>
-            <div class="text-[10px] text-slate-400">~15g Azeite ou Pasta de Amendoim</div>
-          </div>
-          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-            <div class="font-bold text-slate-200">2 Mãos em concha</div>
-            <div class="text-[10px] text-slate-400">Vegetais e Saladas livres</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Checklist de Refeições -->
+      <!-- GUIA DE PORÇÕES SEM BALANÇA -->
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2.5">
-        <h4 class="text-xs font-bold text-white">Plano de Refeições do Dia</h4>
-        <div id="meals-container" class="space-y-2">
-          <!-- Renderizado dinamicamente com checkbox persistente -->
-        </div>
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-hand text-amber-400"></i>
+          <span>Guia Visual da Mão (Sem Balança)</span>
+        </h3>
+        <ul class="text-xs text-slate-300 space-y-2">
+          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span> <strong>Palma da mão:</strong> ~150g de frango, carne ou peixe (~32g proteína).</li>
+          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span> <strong>Punho fechado:</strong> ~100g de arroz cozido, feijão ou batata.</li>
+          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> <strong>Polegar:</strong> ~15ml de azeite ou pasta de amendoim (~12g gordura boa).</li>
+        </ul>
+      </div>
+
+      <!-- CHECKLIST DE REFEIÇÕES -->
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+        <h3 class="text-sm font-bold text-white">Refeições de Hoje</h3>
+        <div id="meals-checklist" class="space-y-2"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- ========================================== -->
-  <!-- MODAL: GUIA VISUAL & FOTO DO EXERCÍCIO -->
-  <!-- ========================================== -->
-  <div id="guide-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto space-y-3.5">
-      
-      <div class="flex items-start justify-between">
+  <!-- MODAL: VISUALIZAR IMAGEM EM ALTA RESOLUÇÃO -->
+  <div id="image-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
         <div>
-          <span id="modal-ex-badge" class="text-[9px] font-black uppercase tracking-wider text-cyan-400">Treino Push</span>
-          <h3 id="modal-ex-title" class="text-base font-extrabold text-white leading-tight">Supino Reto com Barra</h3>
+          <h3 id="modal-title" class="text-sm font-bold text-white">Exercício</h3>
+          <p id="modal-subtitle" class="text-[11px] text-slate-400">Guia de Postura</p>
         </div>
-        <button type="button" onclick="closeGuideModal()" class="touch-press w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
-          <i class="fa-solid fa-xmark"></i>
+        <button onclick="closeImageModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:bg-slate-700">
+          <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
-      <!-- Display da Foto / Ilustração -->
-      <div class="w-full bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden flex items-center justify-center min-h-[200px] max-h-[280px] p-2">
-        <img id="modal-ex-image" src="" alt="Execução do exercício" class="max-w-full max-h-[260px] object-contain rounded-lg">
+      <div class="p-2 bg-black flex items-center justify-center overflow-auto flex-1 min-h-[220px]">
+        <img id="modal-img" src="" alt="Execução do exercício" class="max-h-[55vh] max-w-full object-contain rounded-lg" />
       </div>
 
-      <!-- Botão para Trocar / Tirar Foto no Celular -->
-      <label class="touch-press w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 border border-slate-700 cursor-pointer transition">
-        <i class="fa-solid fa-camera text-cyan-400"></i>
-        <span>Tirar Foto / Trocar Imagem</span>
-        <input type="file" id="modal-file-upload" accept="image/*" class="hidden" onchange="handleModalImageUpload(event)">
-      </label>
-
-      <!-- Instruções de Postura -->
-      <div class="space-y-2 text-xs">
+      <div class="p-4 border-t border-slate-800 bg-slate-900 space-y-3">
         <div>
-          <span class="text-[10px] font-extrabold uppercase text-slate-400 block mb-1">Passo a Passo de Execução:</span>
-          <p id="modal-ex-steps" class="text-slate-300 leading-relaxed bg-slate-950/80 p-3 rounded-xl border border-slate-800/80"></p>
+          <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Dica de Execução</span>
+          <p id="modal-desc" class="text-xs text-slate-300 leading-relaxed"></p>
         </div>
-        <div class="bg-cyan-950/20 border border-cyan-500/30 p-2.5 rounded-xl text-cyan-200 text-[11px]">
-          <strong class="text-cyan-400 block mb-0.5"><i class="fa-solid fa-shield-halved mr-1"></i> Dica de Biomecânica:</strong>
-          <span id="modal-ex-tip"></span>
-        </div>
+        <label class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer border border-slate-700 active:scale-98 transition">
+          <i class="fa-solid fa-camera text-blue-400"></i> 
+          <span>Tirar Foto / Trocar Imagem do Aparelho</span>
+          <input type="file" accept="image/*" class="hidden" onchange="uploadCustomImageForModal(this)" />
+        </label>
       </div>
-
-      <button type="button" onclick="closeGuideModal()" class="touch-press w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-extrabold rounded-xl text-xs transition">
-        Entendido
-      </button>
-
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- MODAL: CADASTRAR NOVO EXERCÍCIO -->
-  <!-- ========================================== -->
-  <div id="new-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-3">
-      
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
-        <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-          <i class="fa-solid fa-plus-circle text-cyan-400"></i>
-          <span>Novo Exercício</span>
+  <div id="new-exercise-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle text-blue-400"></i>
+          <span>Cadastrar Exercício</span>
         </h3>
-        <button type="button" onclick="closeNewExerciseModal()" class="touch-press text-slate-400 hover:text-white p-1">
+        <button onclick="closeNewExerciseModal()" class="text-slate-400 hover:text-white">
           <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
-      <div class="space-y-2.5 text-xs">
+      <div class="space-y-3 text-xs">
         <div>
           <label class="font-bold text-slate-300 block mb-1">Nome do Exercício *</label>
-          <input type="text" id="new-name" placeholder="Ex: Crossover Polia Alta" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+          <input type="text" id="new-ex-name" placeholder="Ex: Crossover Polia Média" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" />
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="font-bold text-slate-300 block mb-1">Divisão *</label>
-            <select id="new-cat" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            <select id="new-ex-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
               <option value="push">Treino A (Push)</option>
               <option value="pull">Treino B (Pull)</option>
               <option value="legs">Treino C (Legs)</option>
-              <option value="extra">Funcional / Core</option>
+              <option value="outros">Funcional / Core</option>
             </select>
           </div>
           <div>
-            <label class="font-bold text-slate-300 block mb-1">Séries / Reps</label>
-            <input type="text" id="new-reps" placeholder="Ex: 3 x 10-12" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            <label class="font-bold text-slate-300 block mb-1">Séries x Reps</label>
+            <input type="text" id="new-ex-sets" placeholder="Ex: 3 x 10-12" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" />
           </div>
         </div>
 
         <div>
           <label class="font-bold text-slate-300 block mb-1">Músculo Principal</label>
-          <input type="text" id="new-muscle" placeholder="Ex: Peitoral Superior" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+          <input type="text" id="new-ex-muscle" placeholder="Ex: Peitoral Superior, Tríceps" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" />
         </div>
 
-        <div>
-          <label class="font-bold text-slate-300 block mb-1">Foto ou Imagem (Opcional)</label>
-          <input type="file" id="new-photo" accept="image/*" class="w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-cyan-500/20 file:text-cyan-300">
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+          <label class="font-bold text-slate-300 block">Imagem de Referência</label>
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">Nome na pasta <code class="text-blue-400">imagens/</code></span>
+            <input type="text" id="new-ex-img-filename" placeholder="Ex: crossover.png" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white" />
+          </div>
+          <div class="text-center text-[10px] text-slate-500 uppercase font-bold">— OU FOTO DIRETA —</div>
+          <div>
+            <input type="file" id="new-ex-img-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600/20 file:text-blue-400 cursor-pointer" />
+          </div>
         </div>
 
         <div>
           <label class="font-bold text-slate-300 block mb-1">Dica de Execução</label>
-          <textarea id="new-tip" rows="2" placeholder="Ex: Manter cotovelos alinhados e estufar o peito..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"></textarea>
+          <textarea id="new-ex-desc" rows="2" placeholder="Ex: Manter cotovelos levemente fletidos..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
         </div>
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button type="button" onclick="closeNewExerciseModal()" class="touch-press flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancelar</button>
-        <button type="button" onclick="saveNewExercise()" class="touch-press flex-1 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-cyan-500/20">Salvar Exercício</button>
+        <button onclick="closeNewExerciseModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Cancelar</button>
+        <button onclick="saveNewExercise()" class="flex-1 py-2.5 rounded-xl bg-blue-600 active:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25">Cadastrar</button>
       </div>
-
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- BOTTOM NAVIGATION BAR (FIXA E OTIMIZADA) -->
-  <!-- ========================================== -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-[#0c121e]/95 backdrop-blur-xl border-t border-slate-800/90 py-2 px-6">
+  <!-- NAVEGAÇÃO INFERIOR -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-6 py-2.5">
     <div class="max-w-md mx-auto flex items-center justify-around">
-      <button type="button" onclick="switchMainTab('treinos')" id="nav-btn-treinos" class="touch-press flex flex-col items-center gap-1 text-cyan-400">
+      <button onclick="switchTab('treino')" id="tab-treino" class="flex flex-col items-center gap-1 text-blue-400 py-1 transition">
         <i class="fa-solid fa-dumbbell text-base"></i>
         <span class="text-[10px] font-bold">Treinos</span>
       </button>
-      <button type="button" onclick="switchMainTab('historico')" id="nav-btn-historico" class="touch-press flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+      <button onclick="switchTab('historico')" id="tab-historico" class="flex flex-col items-center gap-1 text-slate-400 active:text-slate-200 py-1 transition">
         <i class="fa-solid fa-chart-line text-base"></i>
         <span class="text-[10px] font-bold">Histórico</span>
       </button>
-      <button type="button" onclick="switchMainTab('nutricao')" id="nav-btn-nutricao" class="touch-press flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+      <button onclick="switchTab('nutricao')" id="tab-nutricao" class="flex flex-col items-center gap-1 text-slate-400 active:text-slate-200 py-1 transition">
         <i class="fa-solid fa-utensils text-base"></i>
         <span class="text-[10px] font-bold">Nutrição</span>
       </button>
     </div>
   </nav>
 
-  <!-- ========================================== -->
-  <!-- JAVASCRIPT: MOTOR LÓGICO E PERSISTÊNCIA -->
-  <!-- ========================================== -->
+  <!-- JAVASCRIPT: CRONÔMETRO COM TIMESTAMP REAL + ALARME + HISTÓRICO -->
   <script>
-    // 1. BANCO DE DADOS INICIAL ROBUSTO
-    const DEFAULT_EXERCISES_DATA = [
-      // TREINO A (PUSH)
+    const DEFAULT_EXERCISES = [
+      // PUSH (A)
       {
-        id: "ex_supino",
+        id: "push-supino",
         name: "Supino Reto com Barra",
         category: "push",
-        target: "4 séries × 6 a 10 reps",
-        muscle: "Peitoral Maior, Deltóide Anterior, Tríceps",
+        defaultSetsReps: "4 x 6-10",
+        muscle: "Peitoral Maior, Tríceps",
         imagePath: "imagens/Supino.png",
-        steps: "Deite no banco alinhando os olhos com a barra. Pés cravados no chão e escápulas fechadas. Desça a barra de forma controlada até encostar no meio do peitoral e empurre com potência.",
-        tip: "Mantenha os cotovelos a ~60° do tronco para proteger a cápsula articular dos ombros."
+        instructions: "Escápulas travadas no banco. Desça a barra no terço inferior do peito e empurre com velocidade controlada."
       },
       {
-        id: "ex_desenvolvimento",
+        id: "push-desenvolvimento",
         name: "Desenvolvimento com Halteres",
         category: "push",
-        target: "3 séries × 8 a 12 reps",
-        muscle: "Deltóide Anterior & Lateral, Tríceps",
+        defaultSetsReps: "3 x 8-12",
+        muscle: "Deltoide Anterior & Lateral, Tríceps",
         imagePath: "imagens/Desenvolvimento com Halteres.png",
-        steps: "Sentado no banco com inclinação leve (~75° a 80°). Empurre os halteres para cima no plano escapular sem bater os pesos no topo. Desça até a linha das orelhas/ombros.",
-        tip: "Mantenha o core rígido para não curvar em excesso a coluna lombar."
+        instructions: "Banco a ~75°. Suba os halteres sem bater no topo, mantendo cotovelos levemente à frente da linha do ombro."
       },
       {
-        id: "ex_crucifixo",
-        name: "Crucifixo Reto com Halteres",
+        id: "push-crucifixo",
+        name: "Crucifixo Reto",
         category: "push",
-        target: "3 séries × 10 a 12 reps",
-        muscle: "Isolamento de Peitoral",
+        defaultSetsReps: "3 x 10-15",
+        muscle: "Peitoral Maior (Alongamento)",
         imagePath: "imagens/Crucifixo.png",
-        steps: "Deitado no banco com os cotovelos levemente flexionados e travados nesse ângulo. Abra os braços sentindo o alongamento do peito e una os halteres como se abraçasse um tronco.",
-        tip: "Não deixe os cotovelos descerem além da linha do banco para evitar estresse desnecessário nos tendões."
+        instructions: "Cotovelos levemente flexionados durante todo o percurso. Sinta o alongamento profundo antes de fechar."
       },
       {
-        id: "ex_triceps",
+        id: "push-triceps",
         name: "Tríceps Corda no Pulley",
         category: "push",
-        target: "3 séries × 10 a 15 reps",
+        defaultSetsReps: "3 x 10-15",
         muscle: "Tríceps Braquial",
         imagePath: "imagens/Tríceps.png",
-        steps: "Tronco inclinado à frente, cotovelos colados ao lado das costelas. Estenda os braços para baixo e, no ponto de contração total, afaste as pontas da corda para fora.",
-        tip: "Não deixe os ombros subirem nem use o corpo para dar tranco no peso."
+        instructions: "Cotovelos colados ao lado do corpo. No fim da extensão, abra as pontas da corda para máxima contração."
       },
       {
-        id: "ex_flexao",
+        id: "push-flexao",
         name: "Flexão de Braço (Push-up)",
         category: "push",
-        target: "3 séries × Até a Falha",
-        muscle: "Peitoral, Tríceps e Core",
+        defaultSetsReps: "3 x Até a Falha",
+        muscle: "Peitoral e Core",
         imagePath: "imagens/flexao.png",
-        steps: "Posicione as mãos na largura dos ombros. Corpo em linha reta como uma prancha sólida. Desça até o peitoral quase tocar o chão e suba empurrando com firmeza.",
-        tip: "Glúteos e abdômen contraídos para a pelve não descer antes do peito."
+        instructions: "Corpo reto dos pés à cabeça, abdômen e glúteos contraídos. Desça até quase encostar o peito no chão."
       },
-
-      // TREINO B (PULL)
+      
+      // PULL (B)
       {
-        id: "ex_puxada",
+        id: "pull-puxada",
         name: "Puxada Frontal no Pulley",
         category: "pull",
-        target: "4 séries × 6 a 10 reps",
-        muscle: "Dorsais / Latíssimo, Bíceps",
+        defaultSetsReps: "4 x 6-10",
+        muscle: "Latíssimo / Dorsal, Bíceps",
         imagePath: "imagens/puxada.png",
-        steps: "Ajuste o apoio das coxas. Segure a barra pronada, estufe o peito e tracione a barra em direção ao início do tórax conduzindo a força com os cotovelos para baixo.",
-        tip: "Nunca puxe a barra por trás da cabeça para não forçar as vértebras cervicais."
+        instructions: "Puxe direcionando os cotovelos para baixo e para trás com o peito aberto."
       },
       {
-        id: "ex_remada_curvada",
+        id: "pull-remada-curvada",
         name: "Remada Curvada com Barra",
         category: "pull",
-        target: "4 séries × 8 a 12 reps",
-        muscle: "Dorsais, Trapézio, Romboides",
+        defaultSetsReps: "4 x 8-12",
+        muscle: "Dorsais e Trapézio",
         imagePath: "imagens/remada-curvada.png",
-        steps: "Incline o tronco mantendo a coluna 100% reta e peito aberto. Puxe a barra em direção ao umbigo espremendo as escápulas por 1 segundo no topo.",
-        tip: "Mantenha os joelhos semi-flexionados para tirar a tensão excessiva da lombar."
+        instructions: "Tronco inclinado a 45° com lombar travada e neutra. Tracione a barra em direção ao umbigo."
       },
       {
-        id: "ex_remada_unilateral",
-        name: "Remada Unilateral (Serrote)",
-        category: "pull",
-        target: "3 séries × 10 a 12 reps",
-        muscle: "Grande Dorsal Unilateral",
-        imagePath: "imagens/serrote.png",
-        steps: "Apoie um joelho e uma mão no banco. Mantenha as costas retas. Puxe o halter na direção do quadril sem girar a coluna vertebral.",
-        tip: "Pense em levar o cotovelo para o bolso de trás da calça."
-      },
-      {
-        id: "ex_rosca_direta",
+        id: "pull-rosca",
         name: "Rosca Direta com Barra",
         category: "pull",
-        target: "3 séries × 8 a 12 reps",
-        muscle: "Bíceps Braquial Completo",
+        defaultSetsReps: "3 x 10-15",
+        muscle: "Bíceps Braquial",
         imagePath: "imagens/rosca.png",
-        steps: "Em pé, pés paralelos. Cotovelos fixos ao lado do tronco. Flexione os braços até a contração máxima do bíceps e desça em 2 a 3 segundos controlando a carga.",
-        tip: "Evite jogar os cotovelos para frente no topo para não transferir a força para os ombros."
+        instructions: "Sem balanço de tronco. Suba espremendo o bíceps e controle a descida por 2 a 3 segundos."
       },
 
-      // TREINO C (LEGS)
+      // LEGS (C)
       {
-        id: "ex_agachamento",
-        name: "Agachamento Livre com Barra",
+        id: "legs-agachamento",
+        name: "Agachamento Livre",
         category: "legs",
-        target: "4 séries × 6 a 10 reps",
-        muscle: "Quadríceps, Glúteo Máximo, Core",
-        imagePath: "imagens/agachamento.png",
-        steps: "Barra sobre a musculatura do trapézio. Pés afastados na largura dos ombros com pontas ligeiramente para fora. Agache como se fosse sentar em um banco baixo e suba empurrando o chão.",
-        tip: "Mantenha os joelhos acompanhando sempre a linha da ponta dos pés."
-      },
-      {
-        id: "ex_terra_romeno",
-        name: "Levantamento Terra Romeno (RDL)",
-        category: "legs",
-        target: "4 séries × 8 a 12 reps",
-        muscle: "Posteriores de Coxa e Glúteos",
-        imagePath: "imagens/rdl.png",
-        steps: "Destrave levemente os joelhos e mantenha-os fixos. Jogue o quadril para trás mantendo a barra raspando rente às pernas até sentir o alongamento posterior. Retorne estendendo o quadril.",
-        tip: "Costas retas durante todo o movimento; não curve a coluna lombar."
-      },
-      {
-        id: "ex_leg_press",
-        name: "Leg Press 45°",
-        category: "legs",
-        target: "3 séries × 10 a 12 reps",
+        defaultSetsReps: "4 x 6-10",
         muscle: "Quadríceps e Glúteos",
-        imagePath: "imagens/legpress.png",
-        steps: "Glúteos e lombar bem apoiados no encosto. Destrave a máquina e desça a plataforma até 90° de flexão nos joelhos. Empurre sem 'trancar' as articulações no final.",
-        tip: "Nunca tire o bumbum do assento na descida máxima."
+        imagePath: "imagens/agachamento.png",
+        instructions: "Barra apoiada no trapézio. Desça abrindo os joelhos na linha da ponta dos pés e mantendo o tronco firme."
       },
       {
-        id: "ex_extensora",
+        id: "legs-rdl",
+        name: "Terra Romeno (RDL)",
+        category: "legs",
+        defaultSetsReps: "3 x 8-12",
+        muscle: "Posteriores e Glúteos",
+        imagePath: "imagens/rdl.png",
+        instructions: "Empurre o quadril para trás mantendo as pernas quase retas. Sinta o alongamento dos posteriores."
+      },
+      {
+        id: "legs-extensora",
         name: "Cadeira Extensora",
         category: "legs",
-        target: "3 séries × 12 a 15 reps",
+        defaultSetsReps: "3 x 12-15",
         muscle: "Quadríceps Isolado",
         imagePath: "imagens/extensora.png",
-        steps: "Ajuste o rolo sobre a frente dos tornozelos. Estenda as pernas com controle, segure 1 segundo no topo da contração e desça suavemente.",
-        tip: "Controle a descida para maximizar o tempo sob tensão."
-      },
-      {
-        id: "ex_panturrilha",
-        name: "Panturrilha em Pé",
-        category: "legs",
-        target: "4 séries × 15 a 20 reps",
-        muscle: "Gastrocnêmio e Sóleo",
-        imagePath: "imagens/panturrilha.png",
-        steps: "Ponta dos pés no degrau. Desça os calcanhares para o alongamento completo. Suba na ponta dos pés o mais alto possível e congele 1 segundo.",
-        tip: "Não quique; o ritmo pausado é o segredo do crescimento da panturrilha."
-      },
-
-      // FUNCIONAL / CORE
-      {
-        id: "ex_wall_sit",
-        name: "Wall Sit (Isometria na Parede)",
-        category: "extra",
-        target: "3 séries × 35 a 45 seg",
-        muscle: "Tendão Patelar & Quadríceps",
-        imagePath: "imagens/wallsit.png",
-        steps: "Costas coladas na parede. Deslize até os joelhos ficarem em 90°. Sustente a posição sem apoiar as mãos nas coxas.",
-        tip: "Excelente para proteção e desinflamação dos joelhos em quem joga basquete ou corre."
-      },
-      {
-        id: "ex_step_up",
-        name: "Step-Up na Caixa ou Banco",
-        category: "extra",
-        target: "3 séries × 10 a 12 reps cada",
-        muscle: "Glúteo & Pliometria de Salto",
-        imagePath: "imagens/stepup.png",
-        steps: "Pise com todo o pé na caixa. Suba empurrando exclusivamente pelo calcanhar da perna que está em cima até ficar ereto.",
-        tip: "Não pegue impulso com a perna de trás no chão."
+        instructions: "Segure 1 segundo no topo da extensão antes de descer de forma suave."
       }
     ];
 
-    // 2. ESTADO DA APLICAÇÃO
-    let exercises = [];
-    let logs = [];
+    let appExercises = [];
+    let workoutLogs = [];
+    let finishedWorkouts = [];
     let currentCategory = "push";
-    let activeModalExercise = null;
-    let timerInterval = null;
-    let timerSeconds = 0;
+    let activeModalEx = null;
 
-    // INICIALIZAÇÃO
-    document.addEventListener("DOMContentLoaded", () => {
-      initAppStorage();
-      renderExerciseCards();
-      populateHistoryOptions();
-      renderMealsList();
+    // SISTEMA DE CRONÔMETRO BASEADO EM TIMESTAMP ABSOLUTO (NÃO PERDE TEMPO FORA DA TELA)
+    let timerTargetTime = null;
+    let timerInterval = null;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      loadStorageData();
+      renderExerciseList();
+      populateHistoryFilter();
+      renderMealsChecklist();
+      checkActiveTimerOnLoad();
     });
 
-    function initAppStorage() {
-      // Carrega lista de exercícios
-      const savedEx = localStorage.getItem("ironpulse_exercises");
-      if (savedEx) {
-        try {
-          exercises = JSON.parse(savedEx);
-        } catch (e) {
-          exercises = [...DEFAULT_EXERCISES_DATA];
-        }
-      } else {
-        exercises = [...DEFAULT_EXERCISES_DATA];
-        saveExercisesToLocal();
+    // Detecta quando o usuário volta para o app após alternar abas ou destravar a tela
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && timerTargetTime) {
+        updateTimerDisplay();
       }
+    });
 
-      // Carrega registros de treinos passados
-      const savedLogs = localStorage.getItem("ironpulse_logs");
-      if (savedLogs) {
-        try {
-          logs = JSON.parse(savedLogs);
-        } catch (e) {
-          logs = [];
+    function loadStorageData() {
+      const savedEx = localStorage.getItem("irontracker_exercises");
+      appExercises = savedEx ? JSON.parse(savedEx) : [...DEFAULT_EXERCISES];
+
+      const savedLogs = localStorage.getItem("irontracker_workout_logs");
+      workoutLogs = savedLogs ? JSON.parse(savedLogs) : [];
+
+      const savedFinished = localStorage.getItem("irontracker_finished_workouts");
+      finishedWorkouts = savedFinished ? JSON.parse(savedFinished) : [];
+
+      updateStatsSummary();
+    }
+
+    function saveExercisesToStorage() {
+      localStorage.setItem("irontracker_exercises", JSON.stringify(appExercises));
+    }
+
+    function saveLogsToStorage() {
+      localStorage.setItem("irontracker_workout_logs", JSON.stringify(workoutLogs));
+      updateStatsSummary();
+    }
+
+    function saveFinishedWorkoutsToStorage() {
+      localStorage.setItem("irontracker_finished_workouts", JSON.stringify(finishedWorkouts));
+      updateStatsSummary();
+    }
+
+    function updateStatsSummary() {
+      const wEl = document.getElementById("stat-workouts-count");
+      const sEl = document.getElementById("stat-sets-count");
+      if (wEl) wEl.textContent = finishedWorkouts.length;
+      if (sEl) sEl.textContent = workoutLogs.length;
+    }
+
+    // CRONÔMETRO ROBUSTO: USA Date.now()
+    function setAndStartTimer(seconds) {
+      const now = Date.now();
+      timerTargetTime = now + (seconds * 1000);
+      localStorage.setItem("irontracker_timer_target", timerTargetTime.toString());
+
+      // Destrava o contexto de áudio em evento de toque para permitir o alarme no iOS/Android
+      unlockAudioContext();
+
+      if (timerInterval) clearInterval(timerInterval);
+      updateTimerDisplay();
+      timerInterval = setInterval(updateTimerDisplay, 250);
+
+      // Feedback no badge
+      const badge = document.getElementById("timer-status-badge");
+      if (badge) {
+        badge.textContent = `Descanso (${seconds}s)`;
+        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-600/30 text-blue-400 border border-blue-500/40";
+      }
+    }
+
+    function checkActiveTimerOnLoad() {
+      const saved = localStorage.getItem("irontracker_timer_target");
+      if (saved) {
+        const target = parseInt(saved);
+        if (target > Date.now()) {
+          timerTargetTime = target;
+          timerInterval = setInterval(updateTimerDisplay, 250);
+          updateTimerDisplay();
+        } else {
+          localStorage.removeItem("irontracker_timer_target");
         }
       }
     }
 
-    function saveExercisesToLocal() {
-      localStorage.setItem("ironpulse_exercises", JSON.stringify(exercises));
-    }
-
-    function saveLogsToLocal() {
-      localStorage.setItem("ironpulse_logs", JSON.stringify(logs));
-    }
-
-    // Busca o registro mais recente de um exercício
-    function getLastSessionLog(exerciseId) {
-      const filtered = logs.filter(l => l.exerciseId === exerciseId);
-      if (filtered.length === 0) return null;
-      return filtered[filtered.length - 1];
-    }
-
-    // SVG elegante autogerado para nunca deixar imagem quebrada
-    function getFallbackSVG(title) {
-      const cleanTitle = title.replace(/[<>&"]/g, '');
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" fill="none">
-          <rect width="400" height="300" fill="#0b1326"/>
-          <circle cx="200" cy="120" r="42" fill="#06b6d4" fill-opacity="0.15" stroke="#06b6d4" stroke-width="2"/>
-          <path d="M175 180 L225 180 M200 160 L200 200" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"/>
-          <text x="200" y="240" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="bold">${cleanTitle}</text>
-          <text x="200" y="262" text-anchor="middle" fill="#64748b" font-family="sans-serif" font-size="11">Toque para ver detalhes</text>
-        </svg>
-      `;
-      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    }
-
-    // Trata erro de carregamento de imagem sem travar o app
-    function onImgError(imgEl, exName) {
-      imgEl.onerror = null;
-      imgEl.src = getFallbackSVG(exName);
-    }
-
-    // 3. RENDERIZAÇÃO DOS EXERCÍCIOS
-    function renderExerciseCards() {
-      const container = document.getElementById("exercises-container");
-      const list = exercises.filter(ex => ex.category === currentCategory);
-
-      if (list.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-10 bg-slate-900 border border-slate-800 rounded-2xl p-4">
-            <i class="fa-solid fa-dumbbell text-slate-600 text-3xl mb-2"></i>
-            <p class="text-xs text-slate-400 font-bold">Nenhum exercício nesta categoria.</p>
-            <button type="button" onclick="openNewExerciseModal()" class="touch-press mt-3 px-3.5 py-1.5 rounded-xl bg-cyan-600 text-white text-xs font-bold">Adicionar Exercício</button>
-          </div>
-        `;
+    function updateTimerDisplay() {
+      const display = document.getElementById("timer-large-display");
+      if (!timerTargetTime) {
+        display.textContent = "00:00";
         return;
       }
 
-      container.innerHTML = list.map(ex => {
-        const last = getLastSessionLog(ex.id);
-        const lastKg = last ? last.weight : "";
-        const lastReps = last ? last.reps : "";
-        const lastDate = last ? new Date(last.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : "";
+      const remainingMs = timerTargetTime - Date.now();
+      if (remainingMs <= 0) {
+        // TEMPO ESGOTADO: Toca o alarme e vibra
+        timerTargetTime = null;
+        localStorage.removeItem("irontracker_timer_target");
+        clearInterval(timerInterval);
+        display.textContent = "00:00";
 
-        const imgSrc = ex.customImage || ex.imagePath || `imagens/${ex.name}.png`;
+        const badge = document.getElementById("timer-status-badge");
+        if (badge) {
+          badge.textContent = "Tempo esgotado!";
+          badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-600/30 text-emerald-400 border border-emerald-500/40";
+        }
+
+        triggerAlarm();
+        return;
+      }
+
+      const totalSec = Math.ceil(remainingMs / 1000);
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      display.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function stopTimerManual() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerTargetTime = null;
+      localStorage.removeItem("irontracker_timer_target");
+      document.getElementById("timer-large-display").textContent = "00:00";
+      const badge = document.getElementById("timer-status-badge");
+      if (badge) {
+        badge.textContent = "Parado";
+        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400";
+      }
+    }
+
+    // ÁUDIO E VIBRAÇÃO PARA CELULAR
+    let audioCtx = null;
+    function unlockAudioContext() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      } catch (e) {}
+    }
+
+    function triggerAlarm() {
+      // 1. Vibração se suportado no celular
+      if (navigator.vibrate) {
+        navigator.vibrate([250, 100, 250, 100, 300]);
+      }
+
+      // 2. Alarme sonoro sintetizado em dois tons curtos (alta compatibilidade em Safari e Chrome)
+      try {
+        unlockAudioContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+
+        // Beep 1 (nota Lá 880Hz)
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.frequency.setValueAtTime(880, now);
+        gain1.gain.setValueAtTime(0.3, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.25);
+
+        // Beep 2 (nota aguda 1174Hz)
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.frequency.setValueAtTime(1174, now + 0.3);
+        gain2.gain.setValueAtTime(0.35, now + 0.3);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now + 0.3);
+        osc2.stop(now + 0.65);
+      } catch (e) {
+        console.log("Áudio bloqueado pelo navegador.");
+      }
+    }
+
+    // BOTÃO: FINALIZAR TREINO DO DIA
+    function finishTodayWorkout() {
+      const todayString = new Date().toISOString().split('T')[0];
+      const todayLogs = workoutLogs.filter(l => l.timestamp && l.timestamp.startsWith(todayString));
+
+      if (todayLogs.length === 0) {
+        if (!confirm("Você ainda não salvou nenhuma série hoje. Deseja finalizar o treino mesmo assim?")) {
+          return;
+        }
+      }
+
+      const totalSets = todayLogs.length;
+      const totalVolume = todayLogs.reduce((acc, cur) => acc + (cur.volume || (cur.weight * cur.reps)), 0);
+
+      const workoutSummary = {
+        id: "workout_" + Date.now(),
+        date: new Date().toISOString(),
+        category: currentCategory.toUpperCase(),
+        setsCount: totalSets,
+        totalTonnage: totalVolume,
+        exercisesCompleted: [...new Set(todayLogs.map(l => l.exerciseName))]
+      };
+
+      finishedWorkouts.push(workoutSummary);
+      saveFinishedWorkoutsToStorage();
+
+      alert(`🎉 Treino ${workoutSummary.category} Finalizado com Sucesso!\n\n• Séries salvas hoje: ${totalSets}\n• Volume total levantado: ${totalVolume.toFixed(0)} kg\n\nExcelente trabalho! O resumo foi salvo no seu histórico.`);
+      switchTab('historico');
+    }
+
+    // RECUPERA O ÚLTIMO REGISTRO DO EXERCÍCIO
+    function getLastLog(exId) {
+      const matches = workoutLogs.filter(l => l.exerciseId === exId);
+      return matches.length > 0 ? matches[matches.length - 1] : null;
+    }
+
+    // RENDERIZAÇÃO DA LISTA DE EXERCÍCIOS
+    function renderExerciseList() {
+      const container = document.getElementById("exercise-list");
+      document.getElementById("total-count").textContent = appExercises.length;
+
+      const filtered = currentCategory === "todos" 
+        ? appExercises 
+        : appExercises.filter(ex => ex.category === currentCategory);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 bg-slate-900 border border-slate-800 rounded-2xl">
+            <i class="fa-solid fa-dumbbell text-slate-600 text-3xl mb-2"></i>
+            <p class="text-xs font-semibold text-slate-400">Nenhum exercício nesta categoria.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(ex => {
+        const last = getLastLog(ex.id);
+        const lastWeight = last ? last.weight : "";
+        const lastReps = last ? last.reps : "";
+        const lastDate = last ? new Date(last.timestamp).toLocaleDateString("pt-BR", {day:'2-digit', month:'2-digit'}) : "";
+
+        const imgSrc = ex.customBase64 || ex.imagePath || `imagens/${ex.name}.png`;
 
         return `
-          <div class="bg-slate-900 border border-slate-800/90 rounded-2xl p-3.5 space-y-3 shadow-md" id="card-${ex.id}">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg shadow-black/20">
             
-            <!-- Topo do Card: Informações e Thumbnail -->
-            <div class="flex items-start justify-between gap-2.5">
+            <div class="flex items-start justify-between gap-3">
               <div class="flex-1">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <h3 class="text-sm font-extrabold text-white leading-tight">${ex.name}</h3>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm font-extrabold text-white">${ex.name}</h3>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                    ${ex.defaultSetsReps || "3-4 séries"}
+                  </span>
                 </div>
-                <div class="text-[11px] text-cyan-400 font-bold mt-0.5">${ex.target || '3-4 séries'}</div>
-                <div class="text-[10px] text-slate-400">${ex.muscle || 'Hipertrofia'}</div>
+                <p class="text-xs text-slate-400 mt-0.5">${ex.muscle || "Músculo alvo"}</p>
               </div>
 
-              <!-- Miniatura Clicável com Modal -->
-              <button type="button" onclick="openGuideModal('${ex.id}')" class="touch-press relative w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex-shrink-0 flex items-center justify-center group" title="Ver Guia de Execução">
+              <!-- MINIATURA COM CLIQUE PARA ABRIR EM TELA CHEIA -->
+              <button onclick="openImageModal('${ex.id}')" class="relative w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex-shrink-0 group active:scale-95 transition">
                 <img 
                   src="${imgSrc}" 
                   alt="${ex.name}" 
                   class="w-full h-full object-cover" 
-                  onerror="onImgError(this, '${ex.name}')"
+                  onerror="handleImageErrorFallback(this, '${ex.name}')" 
                 />
-                <div class="absolute inset-0 bg-cyan-950/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-70 group-hover:opacity-100">
                   <i class="fa-solid fa-expand text-white text-xs"></i>
                 </div>
               </button>
             </div>
 
-            <!-- Tag de Memória da Última Sessão -->
-            <div class="flex items-center justify-between px-3 py-1.5 bg-slate-950/70 border border-slate-800/80 rounded-xl text-xs">
-              <div class="flex items-center gap-1.5">
-                <i class="fa-solid fa-clock-rotate-left text-cyan-400 text-[10px]"></i>
+            <!-- MEMÓRIA DE CARGA DA SEMANA ANTERIOR -->
+            <div class="flex items-center justify-between px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs">
+              <div class="flex items-center gap-1.5 text-slate-300">
+                <i class="fa-solid fa-clock-rotate-left text-blue-400 text-[11px]"></i>
                 <span class="text-[11px] text-slate-400">Último treino:</span>
-                <strong class="text-white text-[11px]">${last ? `${lastKg} kg × ${lastReps} reps` : 'Primeiro registro'}</strong>
+                <strong class="text-white">${last ? `${lastWeight} kg × ${lastReps} reps` : 'Nenhum ainda'}</strong>
               </div>
               ${last ? `<span class="text-[10px] font-semibold text-slate-500">${lastDate}</span>` : ''}
             </div>
 
-            <!-- Inputs com Steppers (+ / -) Perfeitos para Mobile Touch -->
-            <div class="grid grid-cols-12 gap-2 pt-1 items-center">
+            <!-- CONTROLES NUMÉRICOS COM BOTÕES + E - -->
+            <div class="grid grid-cols-12 gap-2 items-center pt-1">
               
-              <!-- Carga (kg) -->
-              <div class="col-span-6 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-                <span class="text-[9px] font-extrabold uppercase text-slate-400 block px-1 mb-1">Carga (kg)</span>
-                <div class="flex items-center justify-between">
-                  <button type="button" onclick="stepVal('w-${ex.id}', -2)" class="touch-press w-7 h-7 rounded-lg bg-slate-800 text-slate-200 flex items-center justify-center font-bold text-xs">-</button>
+              <!-- CARGA COM STEPPERS -->
+              <div class="col-span-5">
+                <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Carga (kg)</label>
+                <div class="flex items-center bg-slate-950 border border-slate-700 rounded-xl overflow-hidden">
+                  <button onclick="stepInput('weight-${ex.id}', -2)" class="w-8 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">-</button>
                   <input 
                     type="number" 
-                    id="w-${ex.id}" 
-                    value="${lastKg || ''}" 
-                    placeholder="0" 
-                    step="0.5"
-                    class="w-14 bg-transparent text-center font-black text-sm text-white focus:outline-none"
+                    id="weight-${ex.id}" 
+                    step="0.5" 
+                    value="${lastWeight || ''}" 
+                    placeholder="${lastWeight || '0'}" 
+                    class="w-full bg-transparent text-center font-extrabold text-sm text-white focus:outline-none" 
                   />
-                  <button type="button" onclick="stepVal('w-${ex.id}', 2)" class="touch-press w-7 h-7 rounded-lg bg-slate-800 text-slate-200 flex items-center justify-center font-bold text-xs">+</button>
+                  <button onclick="stepInput('weight-${ex.id}', 2)" class="w-8 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">+</button>
                 </div>
               </div>
 
-              <!-- Repetições -->
-              <div class="col-span-6 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-                <span class="text-[9px] font-extrabold uppercase text-slate-400 block px-1 mb-1">Reps Feitas</span>
-                <div class="flex items-center justify-between">
-                  <button type="button" onclick="stepVal('r-${ex.id}', -1)" class="touch-press w-7 h-7 rounded-lg bg-slate-800 text-slate-200 flex items-center justify-center font-bold text-xs">-</button>
+              <!-- REPETIÇÕES COM STEPPERS -->
+              <div class="col-span-4">
+                <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Reps</label>
+                <div class="flex items-center bg-slate-950 border border-slate-700 rounded-xl overflow-hidden">
+                  <button onclick="stepInput('reps-${ex.id}', -1)" class="w-7 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">-</button>
                   <input 
                     type="number" 
-                    id="r-${ex.id}" 
+                    id="reps-${ex.id}" 
                     value="${lastReps || ''}" 
-                    placeholder="10" 
-                    class="w-14 bg-transparent text-center font-black text-sm text-white focus:outline-none"
+                    placeholder="${lastReps || '10'}" 
+                    class="w-full bg-transparent text-center font-extrabold text-sm text-white focus:outline-none" 
                   />
-                  <button type="button" onclick="stepVal('r-${ex.id}', 1)" class="touch-press w-7 h-7 rounded-lg bg-slate-800 text-slate-200 flex items-center justify-center font-bold text-xs">+</button>
+                  <button onclick="stepInput('reps-${ex.id}', 1)" class="w-7 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">+</button>
                 </div>
+              </div>
+
+              <!-- BOTÃO SALVAR SÉRIE -->
+              <div class="col-span-3 flex items-end">
+                <button 
+                  onclick="recordSet('${ex.id}', '${ex.name}')" 
+                  class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-1 shadow-lg shadow-blue-600/20 transition">
+                  <i class="fa-solid fa-check"></i>
+                  <span>Salvar</span>
+                </button>
               </div>
 
             </div>
 
-            <!-- Botão Salvar Série -->
-            <button 
-              type="button" 
-              onclick="saveSet('${ex.id}', '${ex.name}')" 
-              id="btn-save-${ex.id}"
-              class="touch-press w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 active:bg-emerald-600 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-cyan-600/20 transition">
-              <i class="fa-solid fa-check text-xs"></i>
-              <span>Salvar Série</span>
-            </button>
+            <div id="feedback-${ex.id}" class="hidden text-center py-1 text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 rounded-lg">
+              ✓ Série registrada e cronômetro iniciado!
+            </div>
 
           </div>
         `;
       }).join("");
     }
 
-    // Auxiliar para botões + e -
-    function stepVal(inputId, delta) {
+    // AJUSTA VALOR NUMÉRICO (+ ou -)
+    function stepInput(inputId, delta) {
       const input = document.getElementById(inputId);
-      if (!input) return;
-      let val = parseFloat(input.value) || 0;
+      let val = parseFloat(input.value);
+      if (isNaN(val)) val = parseFloat(input.placeholder) || 0;
       val = Math.max(0, val + delta);
       input.value = val;
     }
 
-    // 4. REGISTRO DA SÉRIE COM FEEDBACK IMEDIATO
-    function saveSet(exerciseId, exerciseName) {
-      const wEl = document.getElementById(`w-${exerciseId}`);
-      const rEl = document.getElementById(`r-${exerciseId}`);
-      const btn = document.getElementById(`btn-save-${exerciseId}`);
+    // REGISTRO DE SÉRIE
+    function recordSet(exId, exName) {
+      const wInput = document.getElementById(`weight-${exId}`);
+      const rInput = document.getElementById(`reps-${exId}`);
 
-      const weight = parseFloat(wEl.value);
-      const reps = parseInt(rEl.value);
+      let w = parseFloat(wInput.value);
+      let r = parseInt(rInput.value);
 
-      if (isNaN(weight) || isNaN(reps) || reps <= 0) {
-        // Feedback de erro visual no botão
-        btn.classList.remove('bg-cyan-600');
-        btn.classList.add('bg-amber-600', 'text-white');
-        btn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Preencha kg e reps`;
-        setTimeout(() => {
-          btn.classList.remove('bg-amber-600', 'text-white');
-          btn.classList.add('bg-cyan-600', 'text-slate-950');
-          btn.innerHTML = `<i class="fa-solid fa-check"></i> Salvar Série`;
-        }, 1500);
-        return;
-      }
+      if (isNaN(w)) w = parseFloat(wInput.placeholder) || 0;
+      if (isNaN(r)) r = parseInt(rInput.placeholder) || 10;
 
       const entry = {
-        id: "log_" + Date.now(),
-        exerciseId: exerciseId,
-        exerciseName: exerciseName,
+        id: "set_" + Date.now(),
+        exerciseId: exId,
+        exerciseName: exName,
         category: currentCategory,
-        weight: weight,
-        reps: reps,
+        weight: w,
+        reps: r,
+        volume: w * r,
         timestamp: new Date().toISOString()
       };
 
-      logs.push(entry);
-      saveLogsToLocal();
+      workoutLogs.push(entry);
+      saveLogsToStorage();
 
-      // Feedback tátil verde de sucesso
-      btn.classList.remove('bg-cyan-600');
-      btn.classList.add('bg-emerald-500', 'text-slate-950');
-      btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Gravado! (+Descanso 90s)`;
+      // Mostra feedback rápido
+      const fb = document.getElementById(`feedback-${exId}`);
+      if (fb) {
+        fb.classList.remove("hidden");
+        setTimeout(() => fb.classList.add("hidden"), 2000);
+      }
 
-      // Inicia cronômetro automático de 90s
-      startRestTimer(90);
+      // Inicia automaticamente o descanso de 90s
+      setAndStartTimer(90);
 
-      // Vibração no celular se disponível
-      if (navigator.vibrate) navigator.vibrate(80);
-
-      setTimeout(() => {
-        renderExerciseCards();
-        populateHistoryOptions();
-      }, 1000);
+      // Re-renderiza para atualizar o badge com os novos valores
+      renderExerciseList();
+      populateHistoryFilter();
     }
 
-    // 5. GUIA VISUAL & MODAL
-    function openGuideModal(id) {
-      const ex = exercises.find(e => e.id === id);
+    // CONTINGÊNCIA DE IMAGEM
+    function handleImageErrorFallback(imgEl, exName) {
+      imgEl.onerror = null;
+      imgEl.parentElement.innerHTML = `
+        <div class="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-1 text-center">
+          <i class="fa-solid fa-dumbbell text-blue-500 text-xs mb-0.5"></i>
+          <span class="text-[8px] font-bold text-slate-400 truncate w-full">${exName}</span>
+        </div>
+      `;
+    }
+
+    // MODAL DE IMAGEM
+    function openImageModal(exId) {
+      const ex = appExercises.find(e => e.id === exId);
       if (!ex) return;
+      activeModalEx = ex;
 
-      activeModalExercise = ex;
-      document.getElementById("modal-ex-badge").innerText = `Treino ${ex.category.toUpperCase()}`;
-      document.getElementById("modal-ex-title").innerText = ex.name;
-      document.getElementById("modal-ex-steps").innerText = ex.steps || "Execute o movimento com ritmo controlado.";
-      document.getElementById("modal-ex-tip").innerText = ex.tip || "Mantenha a postura alinhada e respire ritmicamente.";
+      document.getElementById("modal-title").textContent = ex.name;
+      document.getElementById("modal-subtitle").textContent = ex.muscle || "Biomecânica e Execução";
+      document.getElementById("modal-desc").textContent = ex.instructions || "Mantenha o movimento sob controle e postura alinhada.";
 
-      const img = document.getElementById("modal-ex-image");
-      img.onerror = () => { onImgError(img, ex.name); };
-      img.src = ex.customImage || ex.imagePath || `imagens/${ex.name}.png`;
+      const modalImg = document.getElementById("modal-img");
+      modalImg.src = ex.customBase64 || ex.imagePath || `imagens/${ex.name}.png`;
+      modalImg.onerror = () => {
+        modalImg.src = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop&q=80";
+      };
 
-      const modal = document.getElementById("guide-modal");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
+      const m = document.getElementById("image-modal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
     }
 
-    function closeGuideModal() {
-      const modal = document.getElementById("guide-modal");
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-      activeModalExercise = null;
+    function closeImageModal() {
+      const m = document.getElementById("image-modal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
+      activeModalEx = null;
     }
 
-    // Processa upload de imagem e armazena em Base64 no celular
-    function handleModalImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file || !activeModalExercise) return;
-
+    // FOTO DIRETA PELO CELULAR
+    function uploadCustomImageForModal(input) {
+      if (!input.files || !input.files[0] || !activeModalEx) return;
+      const file = input.files[0];
       const reader = new FileReader();
       reader.onload = function(e) {
-        const base64 = e.target.result;
-        activeModalExercise.customImage = base64;
-        saveExercisesToLocal();
-        document.getElementById("modal-ex-image").src = base64;
-        renderExerciseCards();
+        const b64 = e.target.result;
+        activeModalEx.customBase64 = b64;
+        saveExercisesToStorage();
+        document.getElementById("modal-img").src = b64;
+        renderExerciseList();
+        alert(`Imagem de "${activeModalEx.name}" salva com sucesso no seu dispositivo!`);
       };
       reader.readAsDataURL(file);
     }
 
-    // 6. NOVO EXERCÍCIO
+    // CADASTRAR EXERCÍCIO
     function openNewExerciseModal() {
-      const modal = document.getElementById("new-modal");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
+      const m = document.getElementById("new-exercise-modal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
     }
 
     function closeNewExerciseModal() {
-      const modal = document.getElementById("new-modal");
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
+      const m = document.getElementById("new-exercise-modal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
     }
 
     function saveNewExercise() {
-      const name = document.getElementById("new-name").value.trim();
-      const cat = document.getElementById("new-cat").value;
-      const reps = document.getElementById("new-reps").value.trim();
-      const muscle = document.getElementById("new-muscle").value.trim();
-      const tip = document.getElementById("new-tip").value.trim();
-      const photoInput = document.getElementById("new-photo");
+      const name = document.getElementById("new-ex-name").value.trim();
+      const cat = document.getElementById("new-ex-cat").value;
+      const sets = document.getElementById("new-ex-sets").value.trim();
+      const muscle = document.getElementById("new-ex-muscle").value.trim();
+      const filename = document.getElementById("new-ex-img-filename").value.trim();
+      const desc = document.getElementById("new-ex-desc").value.trim();
+      const fileInput = document.getElementById("new-ex-img-file");
 
       if (!name) {
         alert("Preencha o nome do exercício.");
         return;
       }
 
-      const newId = "ex_" + Date.now();
+      const exId = "ex_" + Date.now();
+      const imagePath = filename ? (filename.startsWith("imagens/") ? filename : `imagens/${filename}`) : `imagens/${name}.png`;
 
-      const persist = (customImg = null) => {
-        exercises.push({
-          id: newId,
+      const commit = (b64 = null) => {
+        appExercises.push({
+          id: exId,
           name: name,
           category: cat,
-          target: reps || "3 séries × 10 a 12 reps",
+          defaultSetsReps: sets || "3 x 10-12",
           muscle: muscle || "Geral",
-          imagePath: `imagens/${name}.png`,
-          steps: "Execute o movimento preservando a postura correta e amplitude total.",
-          tip: tip || "Controle a carga e não dê solavancos.",
-          customImage: customImg
+          imagePath: imagePath,
+          instructions: desc || "Mantenha a postura controlada.",
+          customBase64: b64
         });
 
-        saveExercisesToLocal();
+        saveExercisesToStorage();
         closeNewExerciseModal();
-
-        // Reseta formulário
-        document.getElementById("new-name").value = "";
-        document.getElementById("new-reps").value = "";
-        document.getElementById("new-muscle").value = "";
-        document.getElementById("new-tip").value = "";
-        photoInput.value = "";
-
-        // Troca para a aba do exercício criado
-        setWorkoutCategory(cat);
-        populateHistoryOptions();
+        currentCategory = cat;
+        updateCategoryButtonsUI();
+        renderExerciseList();
+        populateHistoryFilter();
+        alert(`Exercício "${name}" adicionado!`);
       };
 
-      if (photoInput.files && photoInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => persist(e.target.result);
-        reader.readAsDataURL(photoInput.files[0]);
+      if (fileInput.files && fileInput.files[0]) {
+        const r = new FileReader();
+        r.onload = e => commit(e.target.result);
+        r.readAsDataURL(fileInput.files[0]);
       } else {
-        persist(null);
+        commit(null);
       }
     }
 
-    // 7. SELEÇÃO DE CATEGORIAS E ABAS PRINCIPAIS
-    function setWorkoutCategory(cat) {
-      currentCategory = cat;
-      const cats = ['push', 'pull', 'legs', 'extra'];
-      cats.forEach(c => {
-        const b = document.getElementById(`btn-cat-${c}`);
-        if (c === cat) {
-          b.className = "touch-press px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 transition";
-        } else {
-          b.className = "touch-press px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition";
-        }
-      });
-      renderExerciseCards();
-    }
+    // NAVEGAÇÃO ENTRE ABAS
+    function switchTab(tab) {
+      document.getElementById("view-treino").classList.toggle("hidden", tab !== "treino");
+      document.getElementById("view-historico").classList.toggle("hidden", tab !== "historico");
+      document.getElementById("view-nutricao").classList.toggle("hidden", tab !== "nutricao");
 
-    function switchMainTab(tab) {
-      document.getElementById("tab-treinos").classList.toggle("hidden", tab !== "treinos");
-      document.getElementById("tab-historico").classList.toggle("hidden", tab !== "historico");
-      document.getElementById("tab-nutricao").classList.toggle("hidden", tab !== "nutricao");
-
-      const tabs = ['treinos', 'historico', 'nutricao'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`nav-btn-${t}`);
+      ["treino", "historico", "nutricao"].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
         if (t === tab) {
-          btn.className = "touch-press flex flex-col items-center gap-1 text-cyan-400";
+          btn.className = "flex flex-col items-center gap-1 text-blue-400 py-1 transition";
         } else {
-          btn.className = "touch-press flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200";
+          btn.className = "flex flex-col items-center gap-1 text-slate-400 active:text-slate-200 py-1 transition";
         }
       });
 
       if (tab === "historico") renderHistoryView();
     }
 
-    // 8. HISTÓRICO
-    function populateHistoryOptions() {
-      const select = document.getElementById("history-filter-select");
-      if (!select) return;
-      const current = select.value;
+    function switchCategory(cat) {
+      currentCategory = cat;
+      updateCategoryButtonsUI();
+      renderExerciseList();
+    }
 
-      select.innerHTML = `<option value="all">Todos os Exercícios</option>`;
-      exercises.forEach(ex => {
-        const opt = document.createElement("option");
-        opt.value = ex.id;
-        opt.textContent = ex.name;
-        select.appendChild(opt);
+    function updateCategoryButtonsUI() {
+      ["push", "pull", "legs", "outros", "todos"].forEach(c => {
+        const btn = document.getElementById(`cat-${c}`);
+        if (!btn) return;
+        if (c === currentCategory) {
+          btn.className = "cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-blue-600 text-white shadow-md shadow-blue-600/25 transition";
+        } else {
+          btn.className = "cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-slate-900 text-slate-400 border border-slate-800 transition";
+        }
       });
-      select.value = current || "all";
+    }
+
+    // HISTÓRICO
+    function populateHistoryFilter() {
+      const s = document.getElementById("filter-history-exercise");
+      if (!s) return;
+      const prev = s.value;
+      s.innerHTML = '<option value="all">Ver Todas as Séries</option>';
+      appExercises.forEach(e => {
+        const opt = document.createElement("option");
+        opt.value = e.id;
+        opt.textContent = e.name;
+        s.appendChild(opt);
+      });
+      s.value = prev || "all";
     }
 
     function renderHistoryView() {
-      const container = document.getElementById("history-list");
-      const filter = document.getElementById("history-filter-select").value;
+      const container = document.getElementById("history-container");
+      const fVal = document.getElementById("filter-history-exercise").value;
 
-      let filtered = [...logs].reverse();
-      if (filter !== "all") {
-        filtered = filtered.filter(l => l.exerciseId === filter);
-      }
+      let list = [...workoutLogs].reverse();
+      if (fVal !== "all") list = list.filter(l => l.exerciseId === fVal);
 
-      if (filtered.length === 0) {
+      if (list.length === 0) {
         container.innerHTML = `
-          <div class="p-6 text-center bg-slate-900 border border-slate-800 rounded-2xl text-xs text-slate-400">
-            Nenhuma série registrada ainda. Conclua seus treinos para gerar o histórico!
-          </div>
-        `;
+          <div class="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 text-xs">
+            Nenhuma série registrada ainda.
+          </div>`;
         return;
       }
 
-      container.innerHTML = filtered.map(item => {
+      container.innerHTML = list.map(item => {
         const d = new Date(item.timestamp);
-        const dataStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        const dataStr = d.toLocaleDateString("pt-BR", { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
 
         return `
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
             <div>
-              <span class="text-xs font-bold text-white block">${item.exerciseName}</span>
-              <span class="text-[10px] text-slate-400">${dataStr}</span>
+              <div class="text-xs font-bold text-white">${item.exerciseName}</div>
+              <div class="text-[10px] text-slate-500">${dataStr}</div>
             </div>
             <div class="flex items-center gap-3">
               <div class="text-right">
-                <span class="text-sm font-black text-cyan-400">${item.weight} kg</span>
-                <span class="text-xs text-slate-300"> × ${item.reps} reps</span>
+                <span class="text-sm font-extrabold text-blue-400">${item.weight} kg</span>
+                <span class="text-xs text-slate-400"> × ${item.reps}</span>
               </div>
-              <button type="button" onclick="deleteSingleLog('${item.id}')" class="text-slate-600 hover:text-rose-400 p-1" title="Apagar série">
+              <button onclick="deleteLog('${item.id}')" class="text-slate-600 hover:text-rose-400 p-1">
                 <i class="fa-solid fa-trash-can text-xs"></i>
               </button>
             </div>
@@ -988,101 +1033,41 @@
       }).join("");
     }
 
-    function deleteSingleLog(logId) {
-      logs = logs.filter(l => l.id !== logId);
-      saveLogsToLocal();
+    function deleteLog(id) {
+      workoutLogs = workoutLogs.filter(l => l.id !== id);
+      saveLogsToStorage();
       renderHistoryView();
-      renderExerciseCards();
+      renderExerciseList();
     }
 
-    function clearAllLogsPrompt() {
+    function clearHistoryConfirm() {
       if (!confirm("Deseja apagar todo o histórico de séries salvas?")) return;
-      logs = [];
-      saveLogsToLocal();
+      workoutLogs = [];
+      finishedWorkouts = [];
+      saveLogsToStorage();
+      saveFinishedWorkoutsToStorage();
       renderHistoryView();
-      renderExerciseCards();
+      renderExerciseList();
     }
 
-    // 9. CRONÔMETRO DE DESCANSO COM ÁUDIO
-    function startRestTimer(sec) {
-      clearInterval(timerInterval);
-      timerSeconds = sec;
-      updateRestTimerUI();
-
-      timerInterval = setInterval(() => {
-        timerSeconds--;
-        updateRestTimerUI();
-
-        if (timerSeconds <= 0) {
-          clearInterval(timerInterval);
-          playAudioTone();
-          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        }
-      }, 1000);
-    }
-
-    function stopRestTimer() {
-      clearInterval(timerInterval);
-      timerSeconds = 0;
-      updateRestTimerUI();
-    }
-
-    function updateRestTimerUI() {
-      const min = Math.floor(timerSeconds / 60);
-      const s = timerSeconds % 60;
-      document.getElementById("timer-display").innerText = 
-        `${min.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-
-    function playAudioTone() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(660, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      } catch (e) {
-        // Áudio bloqueado ou não suportado
-      }
-    }
-
-    // 10. REFEIÇÕES COM CHECKBOX PERSISTENTE
-    function renderMealsList() {
-      const defaultMeals = [
-        { id: "m1", title: "1. Café da Manhã (~600 kcal)", desc: "3 ovos mexidos + 2 fatias pão integral + 1 banana com aveia" },
-        { id: "m2", title: "2. Almoço Completo (~850 kcal)", desc: "180g arroz + 100g feijão + 180g frango/carne + salada com azeite" },
-        { id: "m3", title: "3. Shake Pré/Pós-Treino (~450 kcal)", desc: "1 scoop Whey (30g) + 200ml leite + 1 banana + pasta de amendoim" },
-        { id: "m4", title: "4. Jantar de Recuperação (~800 kcal)", desc: "200g batata ou arroz + 180g peito de frango/patinho + legumes" },
-        { id: "m5", title: "5. Ceia Anabólica (~300 kcal)", desc: "1 pote iogurte natural + 20g castanhas ou fruta" }
+    function renderMealsChecklist() {
+      const meals = [
+        { title: "Café da Manhã (~600 kcal)", desc: "3 ovos + 2 fatias pão integral + banana com aveia" },
+        { title: "Almoço (~850 kcal)", desc: "180g arroz + 100g feijão + 180g carne/frango + salada" },
+        { title: "Lanche da Tarde (~450 kcal)", desc: "Shake whey com banana e aveia / pasta amendoim" },
+        { title: "Jantar (~800 kcal)", desc: "200g batata/arroz + 180g filé ou carne + vegetais" },
+        { title: "Ceia (~300 kcal)", desc: "Iogurte com castanhas ou frutas" }
       ];
 
-      const container = document.getElementById("meals-container");
-      container.innerHTML = defaultMeals.map(m => {
-        const checked = localStorage.getItem(`chk_${m.id}`) === 'true';
-        return `
-          <label class="flex items-start gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer">
-            <input 
-              type="checkbox" 
-              ${checked ? 'checked' : ''} 
-              onchange="toggleMealCheck('${m.id}', this.checked)"
-              class="mt-1 w-4 h-4 rounded text-cyan-500 bg-slate-900 border-slate-700 focus:ring-0 cursor-pointer"
-            >
-            <div class="flex-1">
-              <span class="text-xs font-bold text-white block leading-tight">${m.title}</span>
-              <span class="text-[10px] text-slate-400">${m.desc}</span>
-            </div>
-          </label>
-        `;
-      }).join("");
-    }
-
-    function toggleMealCheck(mealId, isChecked) {
-      localStorage.setItem(`chk_${mealId}`, isChecked ? 'true' : 'false');
+      document.getElementById("meals-checklist").innerHTML = meals.map(m => `
+        <label class="flex items-start gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer">
+          <input type="checkbox" class="mt-1 w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700" />
+          <div>
+            <div class="text-xs font-bold text-white">${m.title}</div>
+            <div class="text-[11px] text-slate-400">${m.desc}</div>
+          </div>
+        </label>
+      `).join("");
     }
   </script>
 </body>
