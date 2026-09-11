@@ -246,20 +246,36 @@
     // URL OFICIAL DA SUA PONTE COM O GOOGLE SHEETS
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9NkaYvRdVIEbysoYwOG9Xz2DCvM4axyMJj9ozqTMWwDnSBpgJPGRB--wjsWYgvN_k/exec";
 
+    // LISTA DE EXERCÍCIOS 100% SINCRONIZADA COM A PLANILHA DO GOOGLE SHEETS
     const EXERCISES = [
-      { id: "push-01", cat: "push", name: "Supino Reto com Barra", muscle: "Peitoral Maior, Tríceps", sets: "4 x 6-10", img: "Imagens/Supino.png", desc: "Escápulas travadas no banco. Descer no terço inferior do esterno." },
-      { id: "push-02", cat: "push", name: "Desenvolvimento com Halteres", muscle: "Deltoide Anterior & Lateral", sets: "3 x 8-12", img: "Imagens/Desenvolvimento com Halteres.png", desc: "Banco a 75°. Subir sem bater os halteres no topo." },
-      { id: "push-03", cat: "push", name: "Crucifixo Reto", muscle: "Peitoral Maior (Alongamento)", sets: "3 x 10-15", img: "Imagens/Crucifixo.png", desc: "Cotovelos levemente fletidos. Sinta o alongamento da musculatura." },
-      { id: "push-04", cat: "push", name: "Tríceps Corda no Pulley", muscle: "Tríceps Braquial", sets: "3 x 10-15", img: "Imagens/Tríceps.png", desc: "Cotovelos colados ao tronco. Abrir a corda no final da extensão." },
-      { id: "push-05", cat: "push", name: "Flexão de Braço", muscle: "Peitoral e Core", sets: "3 x Falha", img: "Imagens/flexao.png", desc: "Corpo reto em prancha sem deixar o quadril ceder." },
+      // PUSH (A)
+      { id: "push-01", cat: "push", name: "Supino Reto com Barra", muscle: "Peitoral Maior, Tríceps", sets: "4 x 6-10", img: "Imagens/Supino.png", desc: "Escápulas travadas no banco. Desça a barra no terço inferior do peito." },
+      { id: "push-02", cat: "push", name: "Desenvolvimento com Halteres", muscle: "Deltoide Anterior e Lateral, Tríceps", sets: "3 x 8-12", img: "Imagens/Desenvolvimento com Halteres.png", desc: "Banco a ~75°. Suba sem bater os halteres no topo." },
+      { id: "push-03", cat: "push", name: "Crucifixo Reto com Halteres", muscle: "Peitoral Maior (Alongamento)", sets: "3 x 10-15", img: "Imagens/Crucifixo.png", desc: "Cotovelos levemente fletidos. Sinta o alongamento da fáscia do peito." },
+      { id: "push-04", cat: "push", name: "Tríceps Corda no Pulley", muscle: "Tríceps Braquial", sets: "3 x 10-15", img: "Imagens/Tríceps.png", desc: "Cotovelos colados ao lado do corpo. Abra a corda na extensão final." },
+      { id: "push-05", cat: "push", name: "Flexão de Braço (Push-up)", muscle: "Peitoral e Core", sets: "3 x Até a Falha", img: "Imagens/flexao.png", desc: "Corpo alinhado em prancha sem deixar o quadril ceder." },
       
-      { id: "pull-01", cat: "pull", name: "Puxada Frontal no Pulley", muscle: "Latíssimo / Dorsal, Bíceps", sets: "4 x 6-10", img: "Imagens/puxada.png", desc: "Puxe direcionando cotovelos para baixo e para trás." },
-      { id: "pull-02", cat: "pull", name: "Remada Curvada com Barra", muscle: "Dorsais e Trapézio", sets: "4 x 8-12", img: "Imagens/remada-curvada.png", desc: "Tronco inclinado a 45°, coluna totalmente travada e neutra." },
-      { id: "pull-03", cat: "pull", name: "Rosca Direta com Barra", muscle: "Bíceps Braquial", sets: "3 x 10-15", img: "Imagens/rosca.png", desc: "Sem balanço de lombar. Controle a descida por 2 a 3 segundos." },
+      // PULL (B)
+      { id: "pull-01", cat: "pull", name: "Puxada Frontal no Pulley", muscle: "Latíssimo do Dorso, Bíceps", sets: "4 x 6-10", img: "Imagens/puxada.png", desc: "Puxe direcionando cotovelos para baixo e para trás com o peito aberto." },
+      { id: "pull-02", cat: "pull", name: "Remada Curvada com Barra", muscle: "Dorsais, Trapézio, Romboides", sets: "4 x 8-12", img: "Imagens/remada-curvada.png", desc: "Tronco a 45°, coluna lombar neutra e travada." },
+      { id: "pull-03", cat: "pull", name: "Remada Unilateral (Serrote)", muscle: "Dorsais e Romboides", sets: "3 x 10-12", img: "Imagens/serrote.png", desc: "Apoio estável no banco. Puxe o halter direcionando ao quadril." },
+      { id: "pull-04", cat: "pull", name: "Rosca Direta com Barra", muscle: "Bíceps Braquial", sets: "3 x 10-15", img: "Imagens/rosca.png", desc: "Sem balanço lombar. Controle a fase excêntrica de descida." },
 
-      { id: "legs-01", cat: "legs", name: "Agachamento Livre", muscle: "Quadríceps e Glúteos", sets: "4 x 6-10", img: "Imagens/agachamento.png", desc: "Pés na largura dos ombros, joelhos acompanhando ponta dos pés." },
-      { id: "legs-02", cat: "legs", name: "Levantamento Terra Romeno (RDL)", muscle: "Posteriores e Glúteos", sets: "3 x 8-12", img: "Imagens/rdl.png", desc: "Empurrar o quadril para trás mantendo os joelhos semiflexionados." },
-      { id: "legs-03", cat: "legs", name: "Cadeira Extensora", muscle: "Quadríceps Isolado", sets: "3 x 12-15", img: "Imagens/extensora.png", desc: "Pausa de 1 segundo de contração no ponto mais alto." }
+      // LEGS (C)
+      { id: "legs-01", cat: "legs", name: "Agachamento Livre (Back Squat)", muscle: "Quadríceps, Glúteos, Core", sets: "4 x 6-10", img: "Imagens/agachamento.png", desc: "Pés na largura dos ombros, joelhos alinhados com a ponta dos pés." },
+      { id: "legs-02", cat: "legs", name: "Levantamento Terra Romeno (RDL)", muscle: "Posteriores de Coxa e Glúteos", sets: "3 x 8-12", img: "Imagens/rdl.png", desc: "Empurre o quadril para trás mantendo os joelhos semiflexionados." },
+      { id: "legs-03", cat: "legs", name: "Leg Press 45°", muscle: "Quadríceps e Glúteos", sets: "3 x 10-12", img: "Imagens/leg-press.png", desc: "Não trave os joelhos na extensão máxima e não tire a lombar do apoio." },
+      { id: "legs-04", cat: "legs", name: "Cadeira Extensora", muscle: "Quadríceps Isolado", sets: "3 x 12-15", img: "Imagens/extensora.png", desc: "Segure 1 segundo no topo da contração máxima." },
+      { id: "legs-05", cat: "legs", name: "Panturrilha em Pé", muscle: "Gastrocnêmio e Sóleo", sets: "4 x 15-20", img: "Imagens/panturrilha.png", desc: "Alongamento total na descida e contração forte na ponta dos pés." },
+
+      // OUTROS / FUNCIONAL & CORE
+      { id: "func-01", cat: "outros", name: "Wall Sit (Agachamento na Parede)", muscle: "Quadríceps Isométrico", sets: "3 x 45-60s", img: "Imagens/wall-sit.png", desc: "Pernas a 90°, tronco bem apoiado na parede." },
+      { id: "func-02", cat: "outros", name: "Step-Up na Caixa / Banco", muscle: "Glúteos e Pliometria", sets: "3 x 10 cada perna", img: "Imagens/step-up.png", desc: "Impulso controlado focado na perna de apoio." },
+      { id: "func-03", cat: "outros", name: "Elevação de Pernas (Leg Raise)", muscle: "Abdômen e Core", sets: "3 x 15-20", img: "Imagens/leg-raise.png", desc: "Lombar colada no chão, suba com controle sem jogar o quadril." },
+      { id: "core-02", cat: "outros", name: "Abdominal Supra na Polia (Cable Crunch)", muscle: "Reto Abdominal (Carga)", sets: "4 x 10-12", img: "Imagens/cable-crunch.png", desc: "Flexione a coluna levando a cabeça em direção aos joelhos mantendo o quadril fixo." },
+      { id: "core-03", cat: "outros", name: "Prancha Frontal Isométrica", muscle: "Transverso do Abdômen e Core", sets: "3 x 45-60s", img: "Imagens/prancha.png", desc: "Cotovelos alinhados aos ombros, abdômen e glúteos travados em linha reta." },
+      { id: "core-04", cat: "outros", name: "Russian Twist / Oblíquos", muscle: "Oblíquos Internos e Externos", sets: "3 x 15-20", img: "Imagens/russian-twist.png", desc: "Tronco inclinado, calcanhares fora do chão, gire controlando a rotação." },
+      { id: "core-05", cat: "outros", name: "Roda Abdominal (Ab Wheel)", muscle: "Core Total & Anti-Extensão", sets: "3 x 8-12", img: "Imagens/roda-abdominal.png", desc: "Role para frente sem deixar a lombar arquear; retorne contraindo o core." }
     ];
 
     let currentCat = "push";
