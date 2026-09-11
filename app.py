@@ -2,184 +2,217 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import time
+import os
+import gspread
+from google.oauth2.service_account import Credentials
 
-# Configuração da página para mobile
-st.set_page_config(
-    page_title="IronTracker",
-    page_icon="🏋️",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="IronTracker", page_icon="🏋️", layout="centered")
 
-# Estilo visual moderno para smartphone
 st.markdown("""
     <style>
-    .block-container { padding-top: 1rem; padding-bottom: 5rem; padding-left: 1rem; padding-right: 1rem; }
-    .stButton>button { width: 100%; border-radius: 12px; font-weight: 700; }
+    .block-container { padding-top: 1rem; padding-bottom: 5rem; padding-left: 0.8rem; padding-right: 0.8rem; }
+    .stButton>button { border-radius: 12px; font-weight: 700; width: 100%; }
     </style>
 """, unsafe_allow_html=True)
 
-# -------------------------------------------------------------
-# 1. CONEXÃO COM A PLANILHA
-# -------------------------------------------------------------
-# Substitua pelo ID da sua planilha do Google Sheets ou use local 'base_treino_completo.xlsx'
-SHEET_ID = "COLE_O_ID_DA_SUA_PLANILHA_AQUI"
-CSV_EXERCICIOS_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Exercicios"
-
-@st.cache_data(ttl=60)
-def carregar_exercicios():
-    try:
-        df = pd.read_csv(CSV_EXERCICIOS_URL)
-        return df
-    except Exception:
-        # Fallback caso esteja rodando offline com o arquivo excel local
-        try:
-            return pd.read_excel("base_treino_completo.xlsx", sheet_name="Exercicios")
-        except Exception:
-            return pd.DataFrame()
-
-# Inicializa histórico em sessão local se não estiver conectado a uma API de gravação
-if "historico_treinos" not in st.session_state:
-    try:
-        df_hist = pd.read_excel("base_treino_completo.xlsx", sheet_name="Registro_Treinos")
-        st.session_state.historico_treinos = df_hist
-    except Exception:
-        st.session_state.historico_treinos = pd.DataFrame(
-            columns=["Data", "Hora", "Divisao", "Exercicio", "Serie", "Carga_kg", "Reps", "Volume_kg", "Observacoes"]
-        )
-
-df_exercicios = carregar_exercicios()
+SCOPE = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive"
+]
 
 # -------------------------------------------------------------
-# 2. TOPO & TIMER DE DESCANSO
+# 1. CONEXÃO COM A PLANILHA (SECRETS)
+# -------------------------------------------------------------
+planilha = None
+aba_ex_ref = None
+aba_hist_ref = None
+df_exercicios = pd.DataFrame()
+df_historico = pd.DataFrame()
+msg_status = None
+
+try:
+    if "gcp_service_account" in st.secrets and "SHEET_ID" in st.secrets:
+        creds_dict = dict(st.secrets["gcp_service_account"])
+        credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
+        client = gspread.authorize(credentials)
+        sheet_id = str(st.secrets["SHEET_ID"]).strip()
+        
+        planilha = client.open_by_key(sheet_id)
+        titulos_abas = [w.title for w in planilha.worksheets()]
+        
+        # Encontra a aba de exercícios
+        for nome in ["Exercicios", "Exercícios", "exercicios", "Sheet1", "Página1", titulos_abas[0]]:
+            if nome in titulos_abas:
+                aba_ex_ref = planilha.worksheet(nome)
+                df_exercicios = pd.DataFrame(aba_ex_ref.get_all_records())
+                break
+                
+        # Encontra a aba de histórico
+        for nome in ["Registro_Treinos", "Registro de Treinos", "Historico", "historico"]:
+            if nome in titulos_abas:
+                aba_hist_ref = planilha.worksheet(nome)
+                df_historico = pd.DataFrame(aba_hist_ref.get_all_records())
+                break
+    else:
+        msg_status = "Configure os Secrets com 'SHEET_ID' e 'gcp_service_account'."
+except Exception as e:
+    msg_status = f"Erro ao acessar Google Sheets: {e}"
+
+# -------------------------------------------------------------
+# 2. FUNÇÃO INTELIGENTE DE BUSCAR IMAGEM (REPO OU URL)
+# -------------------------------------------------------------
+def exibir_imagem_exercicio(caminho_ou_url):
+    if not caminho_ou_url:
+        st.caption("📷 *Sem foto cadastrada*")
+        return
+        
+    caminho_str = str(caminho_ou_url).strip()
+    
+    # 1. Se for link web
+    if caminho_str.startswith("http://") or caminho_str.startswith("https://"):
+        st.image(caminho_str, use_container_width=True)
+        return
+
+    # 2. Se for arquivo local do repositório
+    nome_arquivo = os.path.basename(caminho_str)
+    
+    pastas_para_testar = [
+        "Imagens", "imagens", ".",
+        os.path.join(os.path.dirname(__file__), "Imagens"),
+        os.path.join(os.path.dirname(__file__), "imagens")
+    ]
+    
+    achou = False
+    for pasta in pastas_para_testar:
+        possivel_caminho = os.path.join(pasta, nome_arquivo)
+        if os.path.isfile(possivel_caminho):
+            st.image(possivel_caminho, use_container_width=True)
+            achou = True
+            break
+            
+    if not achou:
+        st.caption(f"📷 *Arquivo '{nome_arquivo}' não achado na pasta Imagens/*")
+
+# -------------------------------------------------------------
+# 3. INTERFACE PRINCIPAL
 # -------------------------------------------------------------
 st.title("🏋️ IronTracker")
-st.caption("Memória de Cargas & Guia Visual de Treino")
+st.caption("Memória de Cargas & Catálogo de Treinos")
 
+if msg_status:
+    st.error(msg_status)
+    st.info("Certifique-se de que compartilhou a planilha com: `app-treino@irontracker-508316.iam.gserviceaccount.com`")
+
+# Cronômetro de descanso
 with st.expander("⏱️ Cronômetro de Descanso", expanded=False):
-    col_t1, col_t2, col_t3 = st.columns(3)
-    if col_t1.button("60s"):
+    c1, c2, c3 = st.columns(3)
+    def contar_tempo(segundos):
         barra = st.progress(100)
-        for i in range(60, 0, -1):
-            barra.progress(int((i / 60) * 100), text=f"Descanso: {i}s restantes")
-            time.sleep(1)
-        st.success("Hora da próxima série!")
-    if col_t2.button("90s"):
-        barra = st.progress(100)
-        for i in range(90, 0, -1):
-            barra.progress(int((i / 90) * 100), text=f"Descanso: {i}s restantes")
-            time.sleep(1)
-        st.success("Hora da próxima série!")
-    if col_t3.button("120s"):
-        barra = st.progress(100)
-        for i in range(120, 0, -1):
-            barra.progress(int((i / 120) * 100), text=f"Descanso: {i}s restantes")
+        texto = st.empty()
+        for s in range(segundos, 0, -1):
+            barra.progress(int((s / segundos) * 100))
+            texto.metric("Tempo Restante", f"{s}s")
             time.sleep(1)
         st.success("Hora da próxima série!")
 
-# -------------------------------------------------------------
-# 3. ABAS: TREINOS vs HISTÓRICO
-# -------------------------------------------------------------
-tab_treino, tab_historico, tab_nutricao = st.tabs(["Treino", "Histórico", "Nutrição"])
+    if c1.button("60s"): contar_tempo(60)
+    if c2.button("90s"): contar_tempo(90)
+    if c3.button("120s"): contar_tempo(120)
+
+tab_treino, tab_historico, tab_nutricao = st.tabs(["Treinos", "Histórico", "Nutrição"])
 
 with tab_treino:
     divisao = st.segmented_control(
-        "Divisão do Dia",
+        "Divisão do Dia:",
         options=["push", "pull", "legs", "outros"],
         format_func=lambda x: {"push": "Push (A)", "pull": "Pull (B)", "legs": "Legs (C)", "outros": "Core/Func"}[x],
         default="push"
     )
 
-    if not df_exercicios.empty and "Divisao" in df_exercicios.columns:
-        df_filtrado = df_exercicios[df_exercicios["Divisao"].str.lower() == divisao]
+    coluna_div = None
+    if not df_exercicios.empty:
+        for c in ["Divisao", "divisao", "Categoria", "categoria"]:
+            if c in df_exercicios.columns:
+                coluna_div = c
+                break
+
+    if not df_exercicios.empty and coluna_div:
+        filtro = df_exercicios[df_exercicios[coluna_div].astype(str).str.lower().str.strip() == divisao]
         
-        for _, ex in df_filtrado.iterrows():
-            nome_ex = ex["Nome_Exercicio"]
-            
+        if filtro.empty:
+            st.info(f"Nenhum exercício encontrado com a divisão '{divisao}'. Verifique a planilha.")
+
+        for _, row in filtro.iterrows():
+            nome_ex = row.get("Nome_Exercicio") or row.get("Exercicio") or row.get("Nome") or "Exercício"
+            ex_id = str(row.get("ID", nome_ex))
+            img_ref = row.get("URL_ou_Caminho_Imagem") or row.get("Imagem") or row.get("URL_Imagem") or ""
+
             with st.container(border=True):
-                col_info, col_img = st.columns([2.2, 1])
-                
-                with col_info:
-                    st.subheader(nome_ex)
-                    st.caption(f"🎯 {ex['Musculo_Alvo']} • {ex['Series_Reps']}")
-                
-                with col_img:
-                    img_path = str(ex.get("URL_ou_Caminho_Imagem", ""))
-                    if img_path.startswith("http"):
-                        st.image(img_path, use_container_width=True)
-                    elif img_path:
-                        try:
-                            st.image(img_path, use_container_width=True)
-                        except Exception:
-                            st.markdown("🖼️ *(sem foto)*")
+                col_texto, col_foto = st.columns([2.2, 1])
 
-                # Memória da última carga
-                hist = st.session_state.historico_treinos
-                ultimo_reg = hist[hist["Exercicio"] == nome_ex]
-                if not ultimo_reg.empty:
-                    ult_linha = ultimo_reg.iloc[-1]
-                    st.info(f"Último registro: **{ult_linha['Carga_kg']} kg × {ult_linha['Reps']} reps** em {ult_linha['Data']}")
+                with col_texto:
+                    st.markdown(f"### {nome_ex}")
+                    musculo = row.get("Musculo_Alvo") or row.get("Musculo") or ""
+                    reps_sug = row.get("Series_Reps") or row.get("Reps") or ""
+                    st.caption(f"🎯 {musculo} • {reps_sug}")
+
+                with col_foto:
+                    exibir_imagem_exercicio(img_ref)
+
+                # Busca o último peso registrado na aba de histórico
+                if not df_historico.empty and "Exercicio" in df_historico.columns:
+                    registros_anteriores = df_historico[df_historico["Exercicio"] == nome_ex]
+                    if not registros_anteriores.empty:
+                        ultimo = registros_anteriores.iloc[-1]
+                        st.info(f"Último: **{ultimo.get('Carga_kg', 0)} kg × {ultimo.get('Reps', 0)} reps** em {ultimo.get('Data', '')}")
+                    else:
+                        st.caption("Nenhum registro anterior.")
                 else:
-                    st.caption("Nenhum registro anterior.")
+                    st.caption("Sem histórico anterior.")
 
-                # Inputs de Carga e Repetições
-                col_c, col_r, col_save = st.columns([1.2, 1.2, 1.4])
-                carga = col_c.number_input("Carga (kg)", min_value=0.0, step=0.5, key=f"c_{ex['ID']}")
-                reps = col_r.number_input("Reps", min_value=1, step=1, value=10, key=f"r_{ex['ID']}")
-                
-                if col_save.button("Salvar Série", key=f"btn_{ex['ID']}"):
-                    novo_log = {
-                        "Data": datetime.now().strftime("%Y-%m-%d"),
-                        "Hora": datetime.now().strftime("%H:%M"),
-                        "Divisao": divisao,
-                        "Exercicio": nome_ex,
-                        "Serie": len(ultimo_reg) + 1,
-                        "Carga_kg": carga,
-                        "Reps": reps,
-                        "Volume_kg": carga * reps,
-                        "Observacoes": "Gravado via app"
-                    }
-                    st.session_state.historico_treinos = pd.concat(
-                        [st.session_state.historico_treinos, pd.DataFrame([novo_log])],
-                        ignore_index=True
-                    )
-                    st.success("Série salva!")
-                    st.rerun()
+                # Inputs de Carga e Reps
+                cc1, cc2, cc3 = st.columns([1.2, 1.2, 1.4])
+                carga = cc1.number_input("Carga (kg)", min_value=0.0, step=0.5, key=f"c_{ex_id}")
+                reps = cc2.number_input("Reps", min_value=1, step=1, value=10, key=f"r_{ex_id}")
+
+                if cc3.button("Salvar Série", key=f"btn_{ex_id}"):
+                    if aba_hist_ref:
+                        nova_linha = [
+                            datetime.now().strftime("%Y-%m-%d"),
+                            datetime.now().strftime("%H:%M"),
+                            divisao,
+                            nome_ex,
+                            1,
+                            carga,
+                            reps,
+                            carga * reps,
+                            "Salvo via App"
+                        ]
+                        aba_hist_ref.append_row(nova_linha)
+                        st.success("Série salva no Google Sheets!")
+                        st.rerun()
+                    else:
+                        st.error("Aba de histórico não encontrada na planilha.")
 
                 with st.expander("Instruções de Postura"):
-                    st.write(ex.get("Instrucoes_Postura", "Execute de forma controlada."))
+                    st.write(row.get("Instrucoes_Postura", "Execute de forma controlada."))
 
         if st.button("🏁 FINALIZAR TREINO DO DIA", type="primary"):
             st.balloons()
-            st.success("Treino concluído com sucesso! Suas cargas estão salvas.")
-    else:
-        st.warning("Carregando exercícios da planilha...")
+            st.success("Treino finalizado com sucesso!")
+    elif df_exercicios.empty and not msg_status:
+        st.warning("A planilha conectou, mas a aba de exercícios parece estar vazia.")
 
 with tab_historico:
-    st.subheader("Histórico de Séries Realizadas")
-    if not st.session_state.historico_treinos.empty:
-        st.dataframe(st.session_state.historico_treinos, use_container_width=True)
-        # Botão para baixar a planilha atualizada
-        csv_data = st.session_state.historico_treinos.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            "📥 Baixar Histórico em CSV",
-            data=csv_data,
-            file_name=f"historico_treino_{datetime.now().strftime('%Y%m%d')}.csv",
-            mime="text/csv"
-        )
+    st.subheader("Histórico de Séries")
+    if not df_historico.empty:
+        st.dataframe(df_historico, use_container_width=True)
     else:
-        st.write("Nenhuma série gravada ainda.")
+        st.info("Nenhuma série salva na aba 'Registro_Treinos'.")
 
 with tab_nutricao:
-    st.subheader("Meta Nutricional Diária (~3.000 kcal)")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Proteína", "160g", "~640 kcal")
-    c2.metric("Carboidratos", "400g", "~1.600 kcal")
-    c3.metric("Gorduras", "85g", "~780 kcal")
-    
-    st.markdown("""
-    **Guia Rápido da Mão:**
-    * 🖐️ **Palma da mão:** ~150g de carne/frango/peixe
-    * ✊ **Punho fechado:** ~100g de arroz ou batata
-    * 👍 **Polegar:** ~15g de azeite ou pasta de amendoim
-    """)
+    st.subheader("Meta Nutricional (~3.000 kcal)")
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Proteína", "160g")
+    m2.metric("Carboidrato", "400g")
+    m3.metric("Gordura", "85g")
