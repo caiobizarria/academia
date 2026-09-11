@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>IronTracker — Treino, Cargas & Nutrição</title>
+  
+  <!-- ÍCONES E LOGO DO APP -->
+  <link rel="icon" type="image/png" href="Imagens/logo.png" />
+  <link rel="apple-touch-icon" href="Imagens/logo.png" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -36,11 +41,18 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-200">
 
-  <!-- HEADER -->
+  <!-- HEADER NATIVO COM SUPORTE A LOGO -->
   <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 transition-colors">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+        <!-- Logo do App com Fallback Automático -->
+        <img 
+          src="Imagens/logo.png" 
+          alt="Logo IronTracker" 
+          class="w-9 h-9 rounded-xl object-contain border border-slate-200 dark:border-slate-800 p-0.5 bg-slate-100 dark:bg-slate-900 shadow-sm"
+          onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='flex';"
+        />
+        <div id="fallback-icon" style="display:none;" class="w-9 h-9 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 items-center justify-center text-blue-600 dark:text-blue-400">
           <i class="fa-solid fa-dumbbell text-lg"></i>
         </div>
         <div>
@@ -78,7 +90,7 @@
         <span class="text-[10px] text-slate-400 font-bold uppercase">min:s</span>
       </div>
 
-      <!-- Linha Unificada: 60s, 90s, 120s e Parar -->
+      <!-- Linha Unificada: 60s, 90s, 120s e Parar Vermelho Vivo -->
       <div class="grid grid-cols-12 gap-1.5 pt-1">
         <button onclick="startTimer(60)" class="col-span-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">60s</button>
         <button onclick="startTimer(90)" class="col-span-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">90s</button>
@@ -120,7 +132,7 @@
       <div id="history-list" class="space-y-2"></div>
     </section>
 
-    <!-- VIEW 3: NUTRIÇÃO CALIBRADA -->
+    <!-- VIEW 3: NUTRIÇÃO CALIBRADA (175g P / 380g C / 85g G) -->
     <section id="view-nutricao" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
         <div class="flex items-center justify-between">
@@ -199,7 +211,7 @@
 
   </main>
 
-  <!-- MODAL DE IMAGEM -->
+  <!-- MODAL DE IMAGEM AMPLIADA -->
   <div id="image-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl">
       <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -231,6 +243,7 @@
   </nav>
 
   <script>
+    // URL OFICIAL DA SUA PONTE COM O GOOGLE SHEETS
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9NkaYvRdVIEbysoYwOG9Xz2DCvM4axyMJj9ozqTMWwDnSBpgJPGRB--wjsWYgvN_k/exec";
 
     const EXERCISES = [
@@ -308,6 +321,7 @@
               <strong class="text-blue-600 dark:text-blue-400">${lastTxt}</strong>
             </div>
 
+            <!-- Ajuste de Carga de 1 em 1 kg -->
             <div class="grid grid-cols-12 gap-1.5 items-center">
               <div class="col-span-5 flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
                 <button onclick="stepVal('w_${e.id}', -1)" class="w-7 py-2 text-xs font-bold text-slate-400 active:bg-slate-200 dark:active:bg-slate-800">-</button>
