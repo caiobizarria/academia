@@ -107,7 +107,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-base font-extrabold">Histórico de Séries</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Sincronizado com o Google Sheets</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Gravando na sua planilha do Google Sheets</p>
         </div>
         <button onclick="exportCSV()" class="px-2.5 py-1.5 rounded-lg bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-xs font-bold flex items-center gap-1 active:scale-95">
           <i class="fa-solid fa-download"></i> Baixar CSV
@@ -191,7 +191,7 @@
   </nav>
 
   <script>
-    // URL OFICIAL DA SUA PONTE COM O GOOGLE SHEETS
+    // URL DA SUA PONTE DO GOOGLE APPS SCRIPT
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9NkaYvRdVIEbysoYwOG9Xz2DCvM4axyMJj9ozqTMWwDnSBpgJPGRB--wjsWYgvN_k/exec";
 
     const EXERCISES = [
@@ -314,21 +314,23 @@
         time: new Date().toLocaleTimeString("pt-BR", {hour:'2-digit', minute:'2-digit'})
       };
 
-      // 1. Salva localmente com resposta instantânea na tela
+      // 1. Salva localmente para resposta instantânea
       logs.push(log);
       localStorage.setItem("it_logs", JSON.stringify(logs));
       startTimer(90);
       renderCards();
       renderHistory();
 
-      // 2. Envia silenciosamente para o Google Sheets em segundo plano
+      // 2. Dispara gravação na planilha usando text/plain para evitar bloqueio de CORS
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith("http")) {
         fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(log)
-        }).catch(err => console.log("Erro de sincronização com Sheets:", err));
+        })
+        .then(() => console.log("Série enviada para a planilha com sucesso!"))
+        .catch(err => console.error("Erro ao enviar:", err));
       }
     }
 
