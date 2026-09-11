@@ -173,13 +173,22 @@
       </div>
 
       <!-- GitHub Folder Notice Card -->
-      <div class="bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-slate-900 border border-blue-500/30 rounded-xl p-3 text-xs flex items-start gap-2.5">
-        <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <i class="fa-solid fa-folder-open text-xs"></i>
-        </div>
-        <div class="flex-1 text-[11px] leading-relaxed text-slate-300">
-          <span class="font-bold text-white block mb-0.5">Pasta <code class="text-cyan-300 bg-slate-950 px-1 py-0.5 rounded border border-slate-800">imagens/</code> integrada</span>
-          O app busca automaticamente seus arquivos: <span class="text-cyan-300 font-semibold">flexao</span>, <span class="text-cyan-300 font-semibold">Tríceps</span>, <span class="text-cyan-300 font-semibold">Crucifixo</span>, <span class="text-cyan-300 font-semibold">Desenvolvimento com Halteres</span> e <span class="text-cyan-300 font-semibold">Supino</span> (formatos .jpg, .png, .jpeg ou .webp).
+      <div class="bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-slate-900 border border-blue-500/30 rounded-xl p-3 text-xs flex flex-col gap-2">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-start gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i class="fa-solid fa-images text-xs"></i>
+            </div>
+            <div class="text-[11px] leading-relaxed text-slate-300">
+              <span class="font-bold text-white block mb-0.5">Pasta <code class="text-cyan-300 bg-slate-950 px-1 py-0.5 rounded border border-slate-800">imagens/</code> (.PNG)</span>
+              O app busca arquivos <code class="text-cyan-300 font-bold">.png</code> (com e sem acento/espaço).
+            </div>
+          </div>
+          <!-- Diagnostic trigger -->
+          <button onclick="openDiagnosticModal()" class="px-2.5 py-1 rounded-lg bg-cyan-600/30 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 text-[11px] font-bold transition flex items-center gap-1.5 flex-shrink-0 active:scale-95">
+            <i class="fa-solid fa-stethoscope text-[10px]"></i>
+            <span>Testar Links</span>
+          </button>
         </div>
       </div>
 
@@ -531,6 +540,38 @@
     </div>
   </div>
 
+  <!-- Diagnostic Modal for testing .png path resolution on GitHub Pages -->
+  <div id="diagnostic-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-5 max-h-[85vh] overflow-y-auto custom-scroll">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-network-wired text-cyan-400"></i> Diagnóstico da Pasta imagens/
+          </h3>
+          <p class="text-[11px] text-slate-400">Status em tempo real das imagens .PNG no seu GitHub Pages</p>
+        </div>
+        <button onclick="closeDiagnosticModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2 mb-4 text-xs" id="diagnostic-results">
+        <div class="p-3 rounded-xl bg-slate-950 text-slate-400 text-center">
+          Clique no botão abaixo para testar as conexões HTTP das imagens.
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="runImageDiagnostics()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-play"></i> Iniciar Verificação das Imagens
+        </button>
+        <button onclick="closeDiagnosticModal()" class="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <nav class="fixed bottom-0 left-0 right-0 z-40 bg-[#0c121e]/95 backdrop-blur-lg border-t border-slate-800 py-2">
     <div class="max-w-lg mx-auto px-4 flex justify-around items-center">
       <button onclick="switchTab('workouts')" id="nav-workouts" class="flex flex-col items-center gap-1 active-nav-btn transition">
@@ -560,19 +601,33 @@
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" fill="none">
           <rect width="600" height="400" fill="${bg}"/>
-          <circle cx="300" cy="170" r="60" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="3"/>
-          <path d="M260 270 L340 270 M300 240 L300 300 M275 160 L325 160 M265 180 L335 180" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
-          <text x="300" y="340" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="20" font-weight="bold">${title}</text>
-          <text x="300" y="370" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="14">Guia Anatômico FitPulse</text>
+          <circle cx="300" cy="170" r="50" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2"/>
+          <path d="M260 250 L340 250 M300 230 L300 270" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+          <text x="300" y="320" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="18" font-weight="bold">${title}</text>
+          <text x="300" y="350" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="12">Foto da pasta imagens/</text>
         </svg>
       `;
       return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     }
 
-    // High quality, direct gym photo references with instant guaranteed fallbacks
-    // Configured to prioritize the user's "imagens/" folder matching exact requested filenames
+    // Helper to generate safe URL candidates (handles UTF-8 accents and space encoding)
+    function buildImageCandidatePaths(baseList) {
+      const extensions = ['.png', '.PNG', '.jpg', '.jpeg', '.webp'];
+      const candidates = [];
+      baseList.forEach(rawBase => {
+        extensions.forEach(ext => {
+          const direct = `${rawBase}${ext}`;
+          const encoded = encodeURI(direct);
+          if (!candidates.includes(direct)) candidates.push(direct);
+          if (direct !== encoded && !candidates.includes(encoded)) candidates.push(encoded);
+        });
+      });
+      return candidates;
+    }
+
+    // Direct database mapped with .png primary priority, URL variations and exact filenames
     const exercisesDB = {
-      // PUSH - Exactly mapped to the requested filenames in folder 'imagens/'
+      // PUSH - Exact requested filenames in PNG format
       supino_reto: {
         id: "supino_reto",
         name: "Supino Reto com Barra",
@@ -582,7 +637,7 @@
         reps: "6 a 10 reps",
         rest: "90s - 120s",
         imgBaseNames: ["imagens/Supino", "imagens/supino"],
-        img: "imagens/Supino.jpg",
+        img: "imagens/Supino.png",
         muscles: ["Peitoral Maior", "Tríceps Braquial", "Deltoide Anterior"],
         steps: [
           "Deite no banco com os olhos alinhados diretamente abaixo da barra.",
@@ -600,8 +655,13 @@
         series: "3 séries",
         reps: "8 a 12 reps",
         rest: "90s",
-        imgBaseNames: ["imagens/Desenvolvimento com Halteres", "imagens/desenvolvimento com halteres", "imagens/desenvolvimento-com-halteres"],
-        img: "imagens/Desenvolvimento com Halteres.jpg",
+        imgBaseNames: [
+          "imagens/Desenvolvimento com Halteres",
+          "imagens/desenvolvimento com halteres",
+          "imagens/desenvolvimento-com-halteres",
+          "imagens/desenvolvimento"
+        ],
+        img: "imagens/Desenvolvimento com Halteres.png",
         muscles: ["Deltoide Anterior", "Deltoide Lateral", "Tríceps Braquial", "Trapézio"],
         steps: [
           "Sentado no banco com apoio nas costas, comece com os halteres na altura dos ombros.",
@@ -620,7 +680,7 @@
         reps: "10 a 12 reps",
         rest: "75s",
         imgBaseNames: ["imagens/Crucifixo", "imagens/crucifixo"],
-        img: "imagens/Crucifixo.jpg",
+        img: "imagens/Crucifixo.png",
         muscles: ["Peitoral Maior", "Deltoide Anterior", "Bíceps (Estabilizador)"],
         steps: [
           "Deitado no banco reto com um halter em cada mão apontando para cima.",
@@ -638,8 +698,13 @@
         series: "3 séries",
         reps: "10 a 15 reps",
         rest: "60s",
-        imgBaseNames: ["imagens/Tríceps", "imagens/triceps", "imagens/Triceps", "imagens/tríceps"],
-        img: "imagens/Tríceps.jpg",
+        imgBaseNames: [
+          "imagens/Tríceps",
+          "imagens/tríceps",
+          "imagens/Triceps",
+          "imagens/triceps"
+        ],
+        img: "imagens/Tríceps.png",
         muscles: ["Tríceps Braquial", "Ancôneo", "Extensores do Punho"],
         steps: [
           "Tronco levemente inclinado à frente com cotovelos colados ao lado da caixa torácica.",
@@ -657,8 +722,13 @@
         series: "3 séries",
         reps: "Até a falha técnica",
         rest: "60s",
-        imgBaseNames: ["imagens/flexao", "imagens/Flexao", "imagens/flexão", "imagens/Flexão"],
-        img: "imagens/flexao.jpg",
+        imgBaseNames: [
+          "imagens/flexao",
+          "imagens/Flexao",
+          "imagens/flexão",
+          "imagens/Flexão"
+        ],
+        img: "imagens/flexao.png",
         muscles: ["Peitoral Maior", "Core Abdominal", "Deltoide Anterior", "Tríceps"],
         steps: [
           "Posicione as mãos um pouco mais largas que a linha dos ombros.",
@@ -679,7 +749,7 @@
         reps: "6 a 10 reps",
         rest: "90s - 120s",
         imgBaseNames: ["imagens/Puxada", "imagens/puxada"],
-        img: "imagens/Puxada.jpg",
+        img: "imagens/Puxada.png",
         muscles: ["Latissimus Dorsi (Grande Dorsal)", "Redondo Maior", "Bíceps Braquial", "Romboides"],
         steps: [
           "Ajuste a almofada da coxa para fixar firmemente o corpo no banco.",
@@ -697,8 +767,8 @@
         series: "4 séries",
         reps: "8 a 12 reps",
         rest: "90s",
-        imgBaseNames: ["imagens/Remada Curvada", "imagens/remada-curvada", "imagens/remada"],
-        img: "imagens/Remada Curvada.jpg",
+        imgBaseNames: ["imagens/Remada Curvada", "imagens/remada-curvada", "imagens/remada_curvada", "imagens/remada"],
+        img: "imagens/Remada Curvada.png",
         muscles: ["Trapézio Médio/Inferior", "Romboides", "Dorsais", "Deltoide Posterior", "Eretores"],
         steps: [
           "Com os joelhos destravados, incline o tronco mantendo as costas retas e o peito aberto.",
@@ -716,8 +786,8 @@
         series: "3 séries",
         reps: "10 a 12 reps cada lado",
         rest: "75s",
-        imgBaseNames: ["imagens/Remada Unilateral", "imagens/serrote"],
-        img: "imagens/Remada Unilateral.jpg",
+        imgBaseNames: ["imagens/Remada Unilateral", "imagens/serrote", "imagens/remada_unilateral"],
+        img: "imagens/Remada Unilateral.png",
         muscles: ["Grande Dorsal", "Romboides", "Deltoide Posterior", "Bíceps"],
         steps: [
           "Apoie um joelho e a mão do mesmo lado sobre o banco reto.",
@@ -735,8 +805,8 @@
         series: "3 séries",
         reps: "8 a 12 reps",
         rest: "60s",
-        imgBaseNames: ["imagens/Rosca Direta", "imagens/rosca-direta", "imagens/biceps"],
-        img: "imagens/Rosca Direta.jpg",
+        imgBaseNames: ["imagens/Rosca Direta", "imagens/rosca-direta", "imagens/rosca_direta", "imagens/biceps"],
+        img: "imagens/Rosca Direta.png",
         muscles: ["Bíceps Braquial (Cabeça Curta & Longa)", "Braquial Anterior", "Braquiorradial"],
         steps: [
           "Em pé com postura ereta e pés na largura dos ombros.",
@@ -757,7 +827,7 @@
         reps: "6 a 10 reps",
         rest: "120s",
         imgBaseNames: ["imagens/Agachamento", "imagens/agachamento"],
-        img: "imagens/Agachamento.jpg",
+        img: "imagens/Agachamento.png",
         muscles: ["Quadríceps Femoral", "Glúteo Máximo", "Adutores", "Eretores da Espinha"],
         steps: [
           "Apoie a barra firme sobre a musculatura do trapézio e tire do suporte.",
@@ -776,7 +846,7 @@
         reps: "8 a 12 reps",
         rest: "90s",
         imgBaseNames: ["imagens/Terra Romeno", "imagens/terra-romeno", "imagens/rdl"],
-        img: "imagens/Terra Romeno.jpg",
+        img: "imagens/Terra Romeno.png",
         muscles: ["Isquiotibiais", "Glúteo Máximo", "Eretores da Coluna"],
         steps: [
           "Segure a barra com pegada pronada na largura das pernas.",
@@ -795,7 +865,7 @@
         reps: "10 a 12 reps",
         rest: "90s",
         imgBaseNames: ["imagens/Leg Press", "imagens/leg-press"],
-        img: "imagens/Leg Press.jpg",
+        img: "imagens/Leg Press.png",
         muscles: ["Quadríceps", "Glúteo Máximo", "Panturrilhas"],
         steps: [
           "Acomode a lombar e os glúteos completamente colados no encosto.",
@@ -814,8 +884,8 @@
         reps: "12 a 15 reps",
         rest: "60s",
         imgBaseNames: ["imagens/Cadeira Extensora", "imagens/extensora"],
-        img: "imagens/Cadeira Extensora.jpg",
-        muscles: ["Quadríceps Femoral (Reto Femoral, Vasto Lateral, Medial e Intermédio)"],
+        img: "imagens/Cadeira Extensora.png",
+        muscles: ["Quadríceps Femoral"],
         steps: [
           "Ajuste o encosto de modo que o joelho fique no mesmo eixo de rotação da máquina.",
           "Apoie a almofada sobre a frente dos tornozelos.",
@@ -833,7 +903,7 @@
         reps: "15 a 20 reps",
         rest: "60s",
         imgBaseNames: ["imagens/Panturrilha", "imagens/panturrilha"],
-        img: "imagens/Panturrilha.jpg",
+        img: "imagens/Panturrilha.png",
         muscles: ["Gastrocnêmio", "Sóleo", "Tibial Posterior"],
         steps: [
           "Apoie a ponta dos pés em um degrau ou step segurando um halter firme em cada mão.",
@@ -854,7 +924,7 @@
         reps: "35 a 45 segundos",
         rest: "60s",
         imgBaseNames: ["imagens/Wall Sit", "imagens/wall-sit"],
-        img: "imagens/Wall Sit.jpg",
+        img: "imagens/Wall Sit.png",
         muscles: ["Quadríceps", "Estabilizadores do Joelho", "Glúteos"],
         steps: [
           "Apoie as costas retas na parede e deslize até os joelhos ficarem em ângulo de 90°.",
@@ -873,7 +943,7 @@
         reps: "10 a 12 reps cada perna",
         rest: "75s",
         imgBaseNames: ["imagens/Step Up", "imagens/step-up"],
-        img: "imagens/Step Up.jpg",
+        img: "imagens/Step Up.png",
         muscles: ["Glúteo Máximo", "Quadríceps", "Panturrilhas"],
         steps: [
           "Pise com todo o pé sobre a caixa ou banco estável.",
@@ -884,175 +954,94 @@
       }
     };
 
-    // Workout lists
-    const workoutRoutines = {
-      push: ["supino_reto", "desenvolvimento_halteres", "crucifixo_halteres", "triceps_corda", "flexao_braco"],
-      pull: ["puxada_pulley", "remada_curvada", "remada_unilateral", "rosca_direta"],
-      legs: ["agachamento_livre", "terra_romeno", "leg_press", "cadeira_extensora", "panturrilha_pe"]
-    };
-
-    // State Variables
-    let currentWorkout = 'push';
-    let currentModalExerciseId = null;
-    let timerInterval = null;
-    let timerSeconds = 0;
-    let waterCurrent = 0;
-    const waterGoal = 3500;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadSavedWater();
-      loadSavedMeals();
-      loadWeightHistory();
-      renderWorkoutExercises();
-      renderGallery('all');
-    });
-
-    // Intelligent image resolver with multi-extension fallbacks for GitHub repos
-    // Tests: .jpg -> .png -> .jpeg -> .webp -> alternate case -> clean fallback SVG
+    // Sequential multi-extension fallback handler focusing on .png and URL-encoding
     function handleImageError(imgElement) {
       const exerciseId = imgElement.getAttribute('data-ex-id');
       const ex = exercisesDB[exerciseId];
       if (!ex) return;
 
-      const formats = ['.jpg', '.png', '.jpeg', '.webp', '.JPG', '.PNG'];
+      const candidates = buildImageCandidatePaths(ex.imgBaseNames || [`imagens/${ex.name}`]);
       let attempt = parseInt(imgElement.getAttribute('data-attempt') || '0', 10);
-      const baseNames = ex.imgBaseNames || [`imagens/${ex.name}`];
 
-      // Calculate total potential variants
-      const totalCombinations = baseNames.length * formats.length;
-
-      if (attempt < totalCombinations) {
-        const nameIdx = Math.floor(attempt / formats.length);
-        const formatIdx = attempt % formats.length;
-        const nextSrc = `${baseNames[nameIdx]}${formats[formatIdx]}`;
-
+      if (attempt < candidates.length) {
         imgElement.setAttribute('data-attempt', (attempt + 1).toString());
-        imgElement.src = nextSrc;
+        imgElement.src = candidates[attempt];
       } else {
-        // All folder extensions attempted; render fallback anatomical vector cleanly
+        // Stop retrying and show clear SVG fallback
         imgElement.onerror = null;
         imgElement.src = generateFallbackSVG(ex.name, '#38bdf8');
       }
     }
 
-    // Tab Switching Logic
-    function switchTab(tab) {
-      const tabs = ['workouts', 'nutrition', 'gallery', 'progress'];
-      tabs.forEach(t => {
-        const el = document.getElementById(`tab-${t}`);
-        const btn = document.getElementById(`nav-${t}`);
-        if (t === tab) {
-          el.classList.remove('hidden');
-          btn.className = "flex flex-col items-center gap-1 active-nav-btn transition";
-        } else {
-          el.classList.add('hidden');
-          btn.className = "flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition";
-        }
-      });
+    // Diagnostic Modal Logic
+    function openDiagnosticModal() {
+      document.getElementById('diagnostic-modal').classList.remove('hidden');
+      runImageDiagnostics();
     }
 
-    // Workout Routine Switching
-    function setWorkout(key) {
-      currentWorkout = key;
-      const btnPush = document.getElementById('btn-push');
-      const btnPull = document.getElementById('btn-pull');
-      const btnLegs = document.getElementById('btn-legs');
+    function closeDiagnosticModal() {
+      document.getElementById('diagnostic-modal').classList.add('hidden');
+    }
 
-      btnPush.className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-semibold text-xs transition active:scale-95";
-      btnPull.className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-semibold text-xs transition active:scale-95";
-      btnLegs.className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-semibold text-xs transition active:scale-95";
+    async function checkUrl(url) {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return { ok: response.ok, status: response.status };
+      } catch (err) {
+        return { ok: false, status: 'Erro de Rede / CORS' };
+      }
+    }
 
-      if (key === 'push') {
-        btnPush.className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-rose-500/50 bg-rose-950/40 text-rose-400 font-bold text-xs transition active:scale-95 shadow-lg shadow-rose-950/20";
-        document.getElementById('workout-label').innerText = "Treino A — Push (Peito, Ombro e Tríceps)";
-      } else if (key === 'pull') {
-        btnPull.className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-sky-500/50 bg-sky-950/40 text-sky-400 font-bold text-xs transition active:scale-95 shadow-lg shadow-sky-950/20";
-        document.getElementById('workout-label').innerText = "Treino B — Pull (Costas e Bíceps)";
-      } else if (key === 'legs') {
-        btnLegs.className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-emerald-400 font-bold text-xs transition active:scale-95 shadow-lg shadow-emerald-950/20";
-        document.getElementById('workout-label').innerText = "Treino C — Legs (Pernas Completas & Panturrilha)";
+    async function runImageDiagnostics() {
+      const container = document.getElementById('diagnostic-results');
+      container.innerHTML = `
+        <div class="p-3 bg-slate-950 rounded-xl text-center text-cyan-400 font-bold text-xs flex items-center justify-center gap-2">
+          <i class="fa-solid fa-spinner fa-spin"></i> Testando arquivos .png na pasta imagens/...
+        </div>
+      `;
+
+      const pushKeys = workoutRoutines.push;
+      let html = '<div class="space-y-2">';
+
+      for (const key of pushKeys) {
+        const ex = exercisesDB[key];
+        const candidates = buildImageCandidatePaths(ex.imgBaseNames).slice(0, 3);
+        let foundCandidate = null;
+
+        for (const path of candidates) {
+          const res = await checkUrl(path);
+          if (res.ok) {
+            foundCandidate = { path, status: res.status };
+            break;
+          }
+        }
+
+        if (foundCandidate) {
+          html += `
+            <div class="p-2.5 bg-emerald-950/30 border border-emerald-500/40 rounded-xl flex items-center justify-between text-xs">
+              <div>
+                <span class="font-bold text-white block">${ex.name}</span>
+                <span class="text-[10px] text-emerald-400 font-mono">${foundCandidate.path}</span>
+              </div>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">200 OK</span>
+            </div>
+          `;
+        } else {
+          const defaultPath = `${ex.imgBaseNames[0]}.png`;
+          html += `
+            <div class="p-2.5 bg-rose-950/30 border border-rose-500/40 rounded-xl flex flex-col gap-1 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white">${ex.name}</span>
+                <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[10px]">404 Não Encontrado</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono truncate">Testado: ${defaultPath}</div>
+              <div class="text-[10px] text-amber-300">Verifique se o arquivo está exatamente em <code class="bg-slate-900 px-1 rounded">${defaultPath}</code> no GitHub.</div>
+            </div>
+          `;
+        }
       }
 
-      renderWorkoutExercises();
-    }
-
-    function getExerciseImage(id) {
-      const customImg = localStorage.getItem(`custom_img_${id}`);
-      if (customImg) return customImg;
-      return exercisesDB[id] ? exercisesDB[id].img : generateFallbackSVG('FitPulse');
-    }
-
-    function renderWorkoutExercises() {
-      const container = document.getElementById('exercises-container');
-      const ids = workoutRoutines[currentWorkout] || [];
-      document.getElementById('workout-stats-badge').innerText = `${ids.length} exercícios`;
-
-      let html = '';
-
-      ids.forEach((id, index) => {
-        const ex = exercisesDB[id];
-        if (!ex) return;
-
-        const imgSrc = getExerciseImage(id);
-        const savedKg = localStorage.getItem(`weight_${id}`) || '';
-        const savedReps = localStorage.getItem(`reps_${id}`) || '';
-        const isDone = localStorage.getItem(`done_${id}`) === 'true';
-
-        html += `
-          <div class="bg-slate-900 border ${isDone ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800 hover:border-slate-700'} rounded-2xl p-3.5 transition-all shadow-md">
-            
-            <div class="flex items-center gap-3">
-              <!-- Exercise Image Thumbnail -->
-              <div onclick="openExerciseModal('${id}')" class="w-20 h-20 bg-slate-950 rounded-xl overflow-hidden border border-slate-700/80 flex-shrink-0 cursor-pointer relative group flex items-center justify-center p-0.5">
-                <img src="${imgSrc}" alt="${ex.name}" data-ex-id="${id}" data-attempt="0" class="w-full h-full object-contain rounded-lg group-hover:scale-105 transition duration-300" onerror="handleImageError(this)">
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition rounded-lg">
-                  <i class="fa-solid fa-up-right-and-down-left-from-center text-cyan-400 text-xs"></i>
-                </div>
-              </div>
-
-              <!-- Exercise Details -->
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-0.5">
-                  <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">#${index + 1}</span>
-                  <span class="text-[10px] text-slate-400 font-medium truncate">${ex.category.split('•')[0]}</span>
-                </div>
-                <h4 onclick="openExerciseModal('${id}')" class="text-sm font-bold text-white tracking-tight leading-snug cursor-pointer hover:text-cyan-400 truncate">
-                  ${ex.name}
-                </h4>
-                <div class="flex flex-wrap items-center gap-2.5 text-[11px] text-slate-300 mt-1 font-medium">
-                  <span class="text-amber-400"><i class="fa-solid fa-layer-group text-[9px] mr-1"></i>${ex.series}</span>
-                  <span><i class="fa-solid fa-repeat text-[9px] mr-1 text-slate-400"></i>${ex.reps}</span>
-                  <span class="text-cyan-400"><i class="fa-solid fa-clock text-[9px] mr-1"></i>${ex.rest}</span>
-                </div>
-              </div>
-
-              <!-- View Details Button -->
-              <button onclick="openExerciseModal('${id}')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 flex flex-col items-center justify-center transition active:scale-95 flex-shrink-0">
-                <i class="fa-solid fa-eye text-xs"></i>
-                <span class="text-[9px] font-bold text-slate-300 mt-0.5">Guia</span>
-              </button>
-            </div>
-
-            <!-- Weight and Reps Row -->
-            <div class="mt-3 pt-2.5 border-t border-slate-800/90 flex items-center justify-between gap-2">
-              <div class="flex items-center gap-1.5 flex-1">
-                <span class="text-[11px] font-medium text-slate-400">Carga:</span>
-                <input type="text" placeholder="ex: 30kg" value="${savedKg}" onchange="saveExerciseLog('${id}', 'weight', this.value)" class="w-full max-w-[85px] bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white font-semibold focus:outline-none focus:border-cyan-500">
-              </div>
-              <div class="flex items-center gap-1.5 flex-1">
-                <span class="text-[11px] font-medium text-slate-400">Reps:</span>
-                <input type="text" placeholder="ex: 10-10-8" value="${savedReps}" onchange="saveExerciseLog('${id}', 'reps', this.value)" class="w-full max-w-[90px] bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white font-semibold focus:outline-none focus:border-cyan-500">
-              </div>
-              <button onclick="toggleExerciseDone('${id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${isDone ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}">
-                <i class="fa-solid ${isDone ? 'fa-check-double' : 'fa-check'} text-[10px]"></i>
-                <span>${isDone ? 'Feito' : 'Check'}</span>
-              </button>
-            </div>
-
-          </div>
-        `;
-      });
-
+      html += '</div>';
       container.innerHTML = html;
     }
 
