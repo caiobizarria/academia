@@ -21,45 +21,55 @@ SCOPE = [
 ]
 
 # -------------------------------------------------------------
-# 1. CONEXÃO COM A PLANILHA (SECRETS)
+# 1. CONEXÃO EM CACHE (EVITA ERRO 429)
 # -------------------------------------------------------------
-planilha = None
-aba_ex_ref = None
-aba_hist_ref = None
-df_exercicios = pd.DataFrame()
-df_historico = pd.DataFrame()
-msg_status = None
+@st.cache_resource
+def obter_cliente_gspread():
+    creds_dict = dict(st.secrets["gcp_service_account"])
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
+    return gspread.authorize(credentials)
 
+@st.cache_data(ttl=600, show_spinner=False)
+def carregar_dados_planilha():
+    client = obter_cliente_gspread()
+    sheet_id = str(st.secrets["SHEET_ID"]).strip()
+    planilha = client.open_by_key(sheet_id)
+    titulos_abas = [w.title for w in planilha.worksheets()]
+    
+    # Busca aba de exercícios
+    dados_ex = []
+    for nome in ["Exercicios", "Exercícios", "exercicios", "Sheet1", "Página1", titulos_abas[0]]:
+        if nome in titulos_abas:
+            aba_ex = planilha.worksheet(nome)
+            dados_ex = aba_ex.get_all_records()
+            break
+
+    # Busca aba de histórico
+    dados_hist = []
+    aba_hist_nome = None
+    for nome in ["Registro_Treinos", "Registro de Treinos", "Historico", "historico"]:
+        if nome in titulos_abas:
+            aba_hist_nome = nome
+            aba_h = planilha.worksheet(nome)
+            dados_hist = aba_h.get_all_records()
+            break
+
+    return pd.DataFrame(dados_ex), pd.DataFrame(dados_hist), aba_hist_nome
+
+# Executa com fallback suave
+msg_status = None
 try:
     if "gcp_service_account" in st.secrets and "SHEET_ID" in st.secrets:
-        creds_dict = dict(st.secrets["gcp_service_account"])
-        credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
-        client = gspread.authorize(credentials)
-        sheet_id = str(st.secrets["SHEET_ID"]).strip()
-        
-        planilha = client.open_by_key(sheet_id)
-        titulos_abas = [w.title for w in planilha.worksheets()]
-        
-        # Encontra a aba de exercícios
-        for nome in ["Exercicios", "Exercícios", "exercicios", "Sheet1", "Página1", titulos_abas[0]]:
-            if nome in titulos_abas:
-                aba_ex_ref = planilha.worksheet(nome)
-                df_exercicios = pd.DataFrame(aba_ex_ref.get_all_records())
-                break
-                
-        # Encontra a aba de histórico
-        for nome in ["Registro_Treinos", "Registro de Treinos", "Historico", "historico"]:
-            if nome in titulos_abas:
-                aba_hist_ref = planilha.worksheet(nome)
-                df_historico = pd.DataFrame(aba_hist_ref.get_all_records())
-                break
+        df_exercicios, df_historico, nome_aba_hist = carregar_dados_planilha()
     else:
-        msg_status = "Configure os Secrets com 'SHEET_ID' e 'gcp_service_account'."
+        df_exercicios, df_historico, nome_aba_hist = pd.DataFrame(), pd.DataFrame(), None
+        msg_status = "Secrets 'SHEET_ID' ou 'gcp_service_account' ausentes."
 except Exception as e:
-    msg_status = f"Erro ao acessar Google Sheets: {e}"
+    df_exercicios, df_historico, nome_aba_hist = pd.DataFrame(), pd.DataFrame(), None
+    msg_status = f"Limite temporário atingido no Google. Aguarde 1 minuto. Detalhe: {e}"
 
 # -------------------------------------------------------------
-# 2. FUNÇÃO INTELIGENTE DE BUSCAR IMAGEM (REPO OU URL)
+# 2. FUNÇÃO INTELIGENTE DE IMAGEM
 # -------------------------------------------------------------
 def exibir_imagem_exercicio(caminho_ou_url):
     if not caminho_ou_url:
@@ -68,14 +78,11 @@ def exibir_imagem_exercicio(caminho_ou_url):
         
     caminho_str = str(caminho_ou_url).strip()
     
-    # 1. Se for link web
     if caminho_str.startswith("http://") or caminho_str.startswith("https://"):
         st.image(caminho_str, use_container_width=True)
         return
 
-    # 2. Se for arquivo local do repositório
     nome_arquivo = os.path.basename(caminho_str)
-    
     pastas_para_testar = [
         "Imagens", "imagens", ".",
         os.path.join(os.path.dirname(__file__), "Imagens"),
@@ -91,7 +98,7 @@ def exibir_imagem_exercicio(caminho_ou_url):
             break
             
     if not achou:
-        st.caption(f"📷 *Arquivo '{nome_arquivo}' não achado na pasta Imagens/*")
+        st.caption(f"📷 *Arquivo '{nome_arquivo}' não encontrado na pasta Imagens/*")
 
 # -------------------------------------------------------------
 # 3. INTERFACE PRINCIPAL
@@ -100,8 +107,7 @@ st.title("🏋️ IronTracker")
 st.caption("Memória de Cargas & Catálogo de Treinos")
 
 if msg_status:
-    st.error(msg_status)
-    st.info("Certifique-se de que compartilhou a planilha com: `app-treino@irontracker-508316.iam.gserviceaccount.com`")
+    st.warning(msg_status)
 
 # Cronômetro de descanso
 with st.expander("⏱️ Cronômetro de Descanso", expanded=False):
@@ -140,7 +146,7 @@ with tab_treino:
         filtro = df_exercicios[df_exercicios[coluna_div].astype(str).str.lower().str.strip() == divisao]
         
         if filtro.empty:
-            st.info(f"Nenhum exercício encontrado com a divisão '{divisao}'. Verifique a planilha.")
+            st.info(f"Nenhum exercício cadastrado para a divisão '{divisao}'.")
 
         for _, row in filtro.iterrows():
             nome_ex = row.get("Nome_Exercicio") or row.get("Exercicio") or row.get("Nome") or "Exercício"
@@ -159,7 +165,7 @@ with tab_treino:
                 with col_foto:
                     exibir_imagem_exercicio(img_ref)
 
-                # Busca o último peso registrado na aba de histórico
+                # Última carga salva
                 if not df_historico.empty and "Exercicio" in df_historico.columns:
                     registros_anteriores = df_historico[df_historico["Exercicio"] == nome_ex]
                     if not registros_anteriores.empty:
@@ -170,13 +176,18 @@ with tab_treino:
                 else:
                     st.caption("Sem histórico anterior.")
 
-                # Inputs de Carga e Reps
+                # Inputs
                 cc1, cc2, cc3 = st.columns([1.2, 1.2, 1.4])
                 carga = cc1.number_input("Carga (kg)", min_value=0.0, step=0.5, key=f"c_{ex_id}")
                 reps = cc2.number_input("Reps", min_value=1, step=1, value=10, key=f"r_{ex_id}")
 
                 if cc3.button("Salvar Série", key=f"btn_{ex_id}"):
-                    if aba_hist_ref:
+                    if nome_aba_hist:
+                        client = obter_cliente_gspread()
+                        sheet_id = str(st.secrets["SHEET_ID"]).strip()
+                        pl = client.open_by_key(sheet_id)
+                        aba_target = pl.worksheet(nome_aba_hist)
+                        
                         nova_linha = [
                             datetime.now().strftime("%Y-%m-%d"),
                             datetime.now().strftime("%H:%M"),
@@ -188,8 +199,9 @@ with tab_treino:
                             carga * reps,
                             "Salvo via App"
                         ]
-                        aba_hist_ref.append_row(nova_linha)
-                        st.success("Série salva no Google Sheets!")
+                        aba_target.append_row(nova_linha)
+                        st.cache_data.clear()  # Limpa o cache para recarregar o novo histórico
+                        st.success("Série salva com sucesso!")
                         st.rerun()
                     else:
                         st.error("Aba de histórico não encontrada na planilha.")
@@ -201,14 +213,14 @@ with tab_treino:
             st.balloons()
             st.success("Treino finalizado com sucesso!")
     elif df_exercicios.empty and not msg_status:
-        st.warning("A planilha conectou, mas a aba de exercícios parece estar vazia.")
+        st.warning("Carregando exercícios...")
 
 with tab_historico:
     st.subheader("Histórico de Séries")
     if not df_historico.empty:
         st.dataframe(df_historico, use_container_width=True)
     else:
-        st.info("Nenhuma série salva na aba 'Registro_Treinos'.")
+        st.info("Nenhuma série salva na aba de histórico.")
 
 with tab_nutricao:
     st.subheader("Meta Nutricional (~3.000 kcal)")
