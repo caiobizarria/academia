@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>IronTracker — Treino, Cargas & Guia</title>
+  <title>IronTracker — Treino & Cargas</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
@@ -33,7 +33,7 @@
         </div>
         <div>
           <h1 class="text-base font-extrabold text-white leading-tight">IronTracker</h1>
-          <p class="text-[11px] text-slate-400">Memória de Cargas & Guia</p>
+          <p class="text-[11px] text-slate-400">Registro & Guia de Exercícios</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -48,36 +48,53 @@
     </div>
   </header>
 
-  <!-- CRONÔMETRO DE DESCANSO GRANDE (FUNCIONA EM SEGUNDO PLANO COM TIMESTAMP) -->
+  <!-- CRONÔMETRO REESTRUTURADO (LAYOUT LIMPO + WAKE LOCK + NOTIFICAÇÕES) -->
   <div class="max-w-2xl mx-auto px-4 pt-3">
-    <div id="timer-box" class="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/40 border border-slate-800 rounded-2xl p-4 shadow-xl shadow-black/40">
-      <div class="flex items-center justify-between mb-2">
+    <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/40 border border-slate-800 rounded-2xl p-4 shadow-xl shadow-black/40 space-y-3">
+      
+      <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+          <span id="timer-dot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
           <span class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Tempo de Descanso</span>
         </div>
-        <span id="timer-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
-          Inativo
-        </span>
-      </div>
-
-      <div class="flex items-center justify-between gap-4">
-        <!-- NÚMERO GIGANTE -->
-        <div class="flex items-baseline gap-1">
-          <div id="timer-large-display" class="text-4xl md:text-5xl font-black font-mono text-white tracking-tight">00:00</div>
-          <span class="text-xs text-slate-500 font-semibold">min:seg</span>
-        </div>
-
-        <!-- BOTÕES DE CONTROLE RÁPIDO -->
-        <div class="flex items-center gap-1.5">
-          <button onclick="setAndStartTimer(60)" class="timer-btn px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 active:border-blue-500 text-xs font-bold text-slate-200 active:text-white transition">60s</button>
-          <button onclick="setAndStartTimer(90)" class="timer-btn px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 active:border-blue-500 text-xs font-bold text-slate-200 active:text-white transition">90s</button>
-          <button onclick="setAndStartTimer(120)" class="timer-btn px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 active:border-blue-500 text-xs font-bold text-slate-200 active:text-white transition">120s</button>
-          <button onclick="stopTimerManual()" title="Parar" class="w-9 h-9 rounded-xl bg-rose-950/40 border border-rose-800/50 text-rose-400 active:scale-95 flex items-center justify-center transition">
-            <i class="fa-solid fa-stop text-sm"></i>
+        <div class="flex items-center gap-2">
+          <button onclick="requestNotificationPermission()" id="btn-notif" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1">
+            <i class="fa-regular fa-bell"></i>
+            <span>Ativar Alerta</span>
           </button>
+          <span id="timer-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400">
+            Pronto
+          </span>
         </div>
       </div>
+
+      <!-- TIMER E CONTROLES PRINCIPAIS -->
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-baseline gap-1.5">
+          <div id="timer-large-display" class="text-4xl md:text-5xl font-black font-mono text-white tracking-tight">00:00</div>
+          <span class="text-[11px] text-slate-500 font-semibold">min:seg</span>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <button onclick="setAndStartTimer(60)" class="px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 text-xs font-bold text-slate-200 active:text-white transition">60s</button>
+          <button onclick="setAndStartTimer(90)" class="px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 text-xs font-bold text-slate-200 active:text-white transition">90s</button>
+          <button onclick="setAndStartTimer(120)" class="px-3 py-2 rounded-xl bg-slate-800 active:bg-blue-600 border border-slate-700 text-xs font-bold text-slate-200 active:text-white transition">120s</button>
+        </div>
+      </div>
+
+      <!-- BARRA INFERIOR DO TIMER: BOTÃO PARAR REPOSICIONADO + MANTER TELA ATIVA -->
+      <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
+        <button onclick="stopTimerManual()" class="flex-1 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/40 text-rose-300 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-98 transition">
+          <i class="fa-solid fa-stop text-[10px]"></i>
+          <span>Parar Cronômetro</span>
+        </button>
+
+        <label class="flex items-center gap-1.5 text-[11px] text-slate-400 cursor-pointer px-2 py-1 rounded bg-slate-950/60 border border-slate-800">
+          <input type="checkbox" id="chk-wakelock" onchange="toggleWakeLock(this.checked)" class="rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0 w-3.5 h-3.5" />
+          <span>Tela sempre ativa</span>
+        </label>
+      </div>
+
     </div>
   </div>
 
@@ -87,7 +104,7 @@
     <!-- VIEW: TREINO ATUAL -->
     <section id="view-treino" class="space-y-4">
       
-      <!-- SELETOR DE DIVISÃO -->
+      <!-- SELETOR DE CATEGORIA -->
       <div class="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
         <button onclick="switchCategory('push')" id="cat-push" class="cat-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap bg-blue-600 text-white shadow-md shadow-blue-600/25 transition">
           Treino A (Push)
@@ -106,12 +123,10 @@
         </button>
       </div>
 
-      <!-- LISTA DE CARDS DE EXERCÍCIOS -->
-      <div id="exercise-list" class="space-y-4">
-        <!-- Renderizado dinamicamente via JS -->
-      </div>
+      <!-- LISTA DE CARDS -->
+      <div id="exercise-list" class="space-y-4"></div>
 
-      <!-- BOTÃO DE FINALIZAR NO FINAL DA LISTA -->
+      <!-- FINALIZAR TREINO -->
       <div class="pt-2 pb-6">
         <button onclick="finishTodayWorkout()" class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 transition">
           <i class="fa-solid fa-check-double text-base"></i>
@@ -120,16 +135,34 @@
       </div>
     </section>
 
-    <!-- VIEW: HISTÓRICO GERAL & TREINOS FINALIZADOS -->
+    <!-- VIEW: HISTÓRICO & INTEGRAÇÃO COM PLANILHA -->
     <section id="view-historico" class="hidden space-y-4">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-base font-extrabold text-white">Histórico Completo</h2>
-          <p class="text-xs text-slate-400">Sessões e séries registradas</p>
+          <h2 class="text-base font-extrabold text-white">Histórico de Treinos</h2>
+          <p class="text-xs text-slate-400">Registros gravados no aparelho</p>
         </div>
-        <button onclick="clearHistoryConfirm()" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-2.5 py-1.5 rounded-lg bg-rose-950/30 border border-rose-800/30 active:scale-95">
+        <button onclick="clearHistoryConfirm()" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-2.5 py-1.5 rounded-lg bg-rose-950/30 border border-rose-800/30">
           Limpar
         </button>
+      </div>
+
+      <!-- CARD DE CONEXÃO COM GOOGLE PLANILHAS / BANCO EXTERNO -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <i class="fa-solid fa-table text-emerald-400"></i> Sincronização de Dados
+          </span>
+          <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Offline / Local</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Os dados ficam salvos de forma segura no seu aparelho. Você pode exportar o arquivo para backup a qualquer momento.
+        </p>
+        <div class="flex gap-2 pt-1">
+          <button onclick="exportHistoryCSV()" class="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition">
+            <i class="fa-solid fa-download mr-1 text-blue-400"></i> Baixar Planilha CSV
+          </button>
+        </div>
       </div>
 
       <!-- RESUMO RÁPIDO -->
@@ -139,12 +172,12 @@
           <span id="stat-workouts-count" class="text-xl font-black text-white">0</span>
         </div>
         <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl">
-          <span class="text-[10px] uppercase font-bold text-blue-400 block">Total de Séries Salvas</span>
+          <span class="text-[10px] uppercase font-bold text-blue-400 block">Séries Salvas</span>
           <span id="stat-sets-count" class="text-xl font-black text-white">0</span>
         </div>
       </div>
 
-      <!-- FILTRO POR EXERCÍCIO -->
+      <!-- FILTRO -->
       <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl">
         <label class="text-xs font-bold text-slate-400 block mb-1">Filtrar por Exercício</label>
         <select id="filter-history-exercise" onchange="renderHistoryView()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
@@ -152,19 +185,16 @@
         </select>
       </div>
 
-      <!-- TIMELINE DE REGISTROS -->
-      <div id="history-container" class="space-y-2.5">
-        <!-- Renderizado dinamicamente -->
-      </div>
+      <div id="history-container" class="space-y-2.5"></div>
     </section>
 
-    <!-- VIEW: NUTRIÇÃO (~3.000 kcal) -->
+    <!-- VIEW: NUTRIÇÃO -->
     <section id="view-nutricao" class="hidden space-y-4">
       <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/30 border border-slate-800 p-5 rounded-2xl">
         <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-base font-bold text-white">Meta Diária de Hipertrofia</h2>
-            <p class="text-xs text-slate-400">Superávit limpo: ~3.000 kcal / dia</p>
+            <h2 class="text-base font-bold text-white">Metas (~3.000 kcal)</h2>
+            <p class="text-xs text-slate-400">Superávit limpo para hipertrofia</p>
           </div>
           <span class="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-bold">1,86m • 78kg</span>
         </div>
@@ -173,35 +203,18 @@
           <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
             <span class="text-[10px] uppercase font-bold text-blue-400 block">Proteína</span>
             <span class="text-sm font-extrabold text-white">160g</span>
-            <span class="text-[10px] text-slate-500 block">~640 kcal</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
             <span class="text-[10px] uppercase font-bold text-amber-400 block">Carbos</span>
             <span class="text-sm font-extrabold text-white">400g</span>
-            <span class="text-[10px] text-slate-500 block">~1.600 kcal</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
             <span class="text-[10px] uppercase font-bold text-emerald-400 block">Gordura</span>
             <span class="text-sm font-extrabold text-white">85g</span>
-            <span class="text-[10px] text-slate-500 block">~780 kcal</span>
           </div>
         </div>
       </div>
 
-      <!-- GUIA DE PORÇÕES SEM BALANÇA -->
-      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2.5">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-hand text-amber-400"></i>
-          <span>Guia Visual da Mão (Sem Balança)</span>
-        </h3>
-        <ul class="text-xs text-slate-300 space-y-2">
-          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span> <strong>Palma da mão:</strong> ~150g de frango, carne ou peixe (~32g proteína).</li>
-          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span> <strong>Punho fechado:</strong> ~100g de arroz cozido, feijão ou batata.</li>
-          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> <strong>Polegar:</strong> ~15ml de azeite ou pasta de amendoim (~12g gordura boa).</li>
-        </ul>
-      </div>
-
-      <!-- CHECKLIST DE REFEIÇÕES -->
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
         <h3 class="text-sm font-bold text-white">Refeições de Hoje</h3>
         <div id="meals-checklist" class="space-y-2"></div>
@@ -210,7 +223,7 @@
 
   </main>
 
-  <!-- MODAL: VISUALIZAR IMAGEM EM ALTA RESOLUÇÃO -->
+  <!-- MODAL: VISUALIZAR IMAGEM -->
   <div id="image-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
       <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
@@ -282,12 +295,12 @@
         </div>
 
         <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
-          <label class="font-bold text-slate-300 block">Imagem de Referência</label>
+          <label class="font-bold text-slate-300 block">Imagem (Link ou Arquivo)</label>
           <div>
-            <span class="text-[11px] text-slate-400 block mb-1">Nome na pasta <code class="text-blue-400">imagens/</code></span>
-            <input type="text" id="new-ex-img-filename" placeholder="Ex: crossover.png" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white" />
+            <span class="text-[11px] text-slate-400 block mb-1">Link web direto OU nome na pasta <code class="text-blue-400">imagens/</code>:</span>
+            <input type="text" id="new-ex-img-filename" placeholder="Ex: https://... ou crossover.png" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white" />
           </div>
-          <div class="text-center text-[10px] text-slate-500 uppercase font-bold">— OU FOTO DIRETA —</div>
+          <div class="text-center text-[10px] text-slate-500 uppercase font-bold">— OU FOTO DA GALERIA —</div>
           <div>
             <input type="file" id="new-ex-img-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600/20 file:text-blue-400 cursor-pointer" />
           </div>
@@ -295,7 +308,7 @@
 
         <div>
           <label class="font-bold text-slate-300 block mb-1">Dica de Execução</label>
-          <textarea id="new-ex-desc" rows="2" placeholder="Ex: Manter cotovelos levemente fletidos..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
+          <textarea id="new-ex-desc" rows="2" placeholder="Ex: Manter cotovelos estendidos..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
         </div>
       </div>
 
@@ -306,7 +319,7 @@
     </div>
   </div>
 
-  <!-- NAVEGAÇÃO INFERIOR -->
+  <!-- NAVEGAÇÃO FIXA INFERIOR -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-6 py-2.5">
     <div class="max-w-md mx-auto flex items-center justify-around">
       <button onclick="switchTab('treino')" id="tab-treino" class="flex flex-col items-center gap-1 text-blue-400 py-1 transition">
@@ -324,10 +337,9 @@
     </div>
   </nav>
 
-  <!-- JAVASCRIPT: CRONÔMETRO COM TIMESTAMP REAL + ALARME + HISTÓRICO -->
+  <!-- JAVASCRIPT: LÓGICA COMPLETA -->
   <script>
     const DEFAULT_EXERCISES = [
-      // PUSH (A)
       {
         id: "push-supino",
         name: "Supino Reto com Barra",
@@ -373,8 +385,6 @@
         imagePath: "imagens/flexao.png",
         instructions: "Corpo reto dos pés à cabeça, abdômen e glúteos contraídos. Desça até quase encostar o peito no chão."
       },
-      
-      // PULL (B)
       {
         id: "pull-puxada",
         name: "Puxada Frontal no Pulley",
@@ -402,8 +412,6 @@
         imagePath: "imagens/rosca.png",
         instructions: "Sem balanço de tronco. Suba espremendo o bíceps e controle a descida por 2 a 3 segundos."
       },
-
-      // LEGS (C)
       {
         id: "legs-agachamento",
         name: "Agachamento Livre",
@@ -438,8 +446,8 @@
     let finishedWorkouts = [];
     let currentCategory = "push";
     let activeModalEx = null;
+    let wakeLockSentinel = null;
 
-    // SISTEMA DE CRONÔMETRO BASEADO EM TIMESTAMP ABSOLUTO (NÃO PERDE TEMPO FORA DA TELA)
     let timerTargetTime = null;
     let timerInterval = null;
 
@@ -449,9 +457,10 @@
       populateHistoryFilter();
       renderMealsChecklist();
       checkActiveTimerOnLoad();
+      checkNotificationStatus();
     });
 
-    // Detecta quando o usuário volta para o app após alternar abas ou destravar a tela
+    // Detecta volta para a aba
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden && timerTargetTime) {
         updateTimerDisplay();
@@ -492,24 +501,67 @@
       if (sEl) sEl.textContent = workoutLogs.length;
     }
 
-    // CRONÔMETRO ROBUSTO: USA Date.now()
+    // WAKE LOCK (MANTÉM A TELA ACESA SE QUISER)
+    async function toggleWakeLock(enable) {
+      if (!('wakeLock' in navigator)) {
+        alert("Seu navegador não suporta a função de manter a tela ligada.");
+        document.getElementById("chk-wakelock").checked = false;
+        return;
+      }
+      try {
+        if (enable) {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+        } else if (wakeLockSentinel) {
+          await wakeLockSentinel.release();
+          wakeLockSentinel = null;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    // NOTIFICAÇÕES NATIVAS DO SISTEMA
+    function checkNotificationStatus() {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const btn = document.getElementById("btn-notif");
+        if (btn) {
+          btn.innerHTML = `<i class="fa-solid fa-bell text-emerald-400"></i> Alerta Ativo`;
+          btn.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/40";
+        }
+      }
+    }
+
+    function requestNotificationPermission() {
+      if (!('Notification' in window)) {
+        alert("Notificações não são suportadas neste navegador.");
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        checkNotificationStatus();
+        if (permission === 'granted') {
+          new Notification("IronTracker", { body: "Alerta de descanso ativado com sucesso!" });
+        }
+      });
+    }
+
+    // CRONÔMETRO
     function setAndStartTimer(seconds) {
       const now = Date.now();
       timerTargetTime = now + (seconds * 1000);
       localStorage.setItem("irontracker_timer_target", timerTargetTime.toString());
 
-      // Destrava o contexto de áudio em evento de toque para permitir o alarme no iOS/Android
       unlockAudioContext();
 
       if (timerInterval) clearInterval(timerInterval);
       updateTimerDisplay();
       timerInterval = setInterval(updateTimerDisplay, 250);
 
-      // Feedback no badge
+      const dot = document.getElementById("timer-dot");
       const badge = document.getElementById("timer-status-badge");
+      if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse";
       if (badge) {
         badge.textContent = `Descanso (${seconds}s)`;
-        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-600/30 text-blue-400 border border-blue-500/40";
+        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-blue-600/30 text-blue-400 border border-blue-500/40";
       }
     }
 
@@ -536,16 +588,17 @@
 
       const remainingMs = timerTargetTime - Date.now();
       if (remainingMs <= 0) {
-        // TEMPO ESGOTADO: Toca o alarme e vibra
         timerTargetTime = null;
         localStorage.removeItem("irontracker_timer_target");
         clearInterval(timerInterval);
         display.textContent = "00:00";
 
+        const dot = document.getElementById("timer-dot");
         const badge = document.getElementById("timer-status-badge");
+        if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
         if (badge) {
-          badge.textContent = "Tempo esgotado!";
-          badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-600/30 text-emerald-400 border border-emerald-500/40";
+          badge.textContent = "Hora da Série!";
+          badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600/30 text-emerald-400 border border-emerald-500/40";
         }
 
         triggerAlarm();
@@ -563,102 +616,123 @@
       timerTargetTime = null;
       localStorage.removeItem("irontracker_timer_target");
       document.getElementById("timer-large-display").textContent = "00:00";
+      const dot = document.getElementById("timer-dot");
       const badge = document.getElementById("timer-status-badge");
+      if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-slate-600";
       if (badge) {
         badge.textContent = "Parado";
-        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400";
+        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400";
       }
     }
 
-    // ÁUDIO E VIBRAÇÃO PARA CELULAR
+    // ALARME COM ÁUDIO + VIBRAÇÃO + NOTIFICAÇÃO NATIVA
     let audioCtx = null;
     function unlockAudioContext() {
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
       } catch (e) {}
     }
 
     function triggerAlarm() {
-      // 1. Vibração se suportado no celular
-      if (navigator.vibrate) {
-        navigator.vibrate([250, 100, 250, 100, 300]);
+      // 1. Notificação nativa (acende tela e notifica mesmo fora do app)
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification("IronTracker — Descanso Finalizado!", {
+          body: "Seu tempo de intervalo acabou. Prepare-se para a próxima série!",
+          icon: "imagens/Supino.png"
+        });
       }
 
-      // 2. Alarme sonoro sintetizado em dois tons curtos (alta compatibilidade em Safari e Chrome)
+      // 2. Vibração
+      if (navigator.vibrate) {
+        navigator.vibrate([300, 150, 300, 150, 400]);
+      }
+
+      // 3. Som Web Audio
       try {
         unlockAudioContext();
         if (!audioCtx) return;
-
         const now = audioCtx.currentTime;
 
-        // Beep 1 (nota Lá 880Hz)
-        const osc1 = audioCtx.createOscillator();
-        const gain1 = audioCtx.createGain();
-        osc1.frequency.setValueAtTime(880, now);
-        gain1.gain.setValueAtTime(0.3, now);
-        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-        osc1.connect(gain1);
-        gain1.connect(audioCtx.destination);
-        osc1.start(now);
-        osc1.stop(now + 0.25);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(880, now);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
 
-        // Beep 2 (nota aguda 1174Hz)
         const osc2 = audioCtx.createOscillator();
         const gain2 = audioCtx.createGain();
-        osc2.frequency.setValueAtTime(1174, now + 0.3);
-        gain2.gain.setValueAtTime(0.35, now + 0.3);
-        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+        osc2.frequency.setValueAtTime(1174, now + 0.4);
+        gain2.gain.setValueAtTime(0.4, now + 0.4);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
         osc2.connect(gain2);
         gain2.connect(audioCtx.destination);
-        osc2.start(now + 0.3);
-        osc2.stop(now + 0.65);
-      } catch (e) {
-        console.log("Áudio bloqueado pelo navegador.");
-      }
+        osc2.start(now + 0.4);
+        osc2.stop(now + 0.8);
+      } catch (e) {}
     }
 
-    // BOTÃO: FINALIZAR TREINO DO DIA
+    // FINALIZAR TREINO
     function finishTodayWorkout() {
-      const todayString = new Date().toISOString().split('T')[0];
-      const todayLogs = workoutLogs.filter(l => l.timestamp && l.timestamp.startsWith(todayString));
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayLogs = workoutLogs.filter(l => l.timestamp && l.timestamp.startsWith(todayStr));
 
       if (todayLogs.length === 0) {
-        if (!confirm("Você ainda não salvou nenhuma série hoje. Deseja finalizar o treino mesmo assim?")) {
-          return;
-        }
+        if (!confirm("Nenhuma série salva hoje. Deseja finalizar mesmo assim?")) return;
       }
 
       const totalSets = todayLogs.length;
-      const totalVolume = todayLogs.reduce((acc, cur) => acc + (cur.volume || (cur.weight * cur.reps)), 0);
+      const totalVol = todayLogs.reduce((acc, cur) => acc + (cur.volume || (cur.weight * cur.reps)), 0);
 
-      const workoutSummary = {
-        id: "workout_" + Date.now(),
+      const summary = {
+        id: "w_" + Date.now(),
         date: new Date().toISOString(),
         category: currentCategory.toUpperCase(),
         setsCount: totalSets,
-        totalTonnage: totalVolume,
-        exercisesCompleted: [...new Set(todayLogs.map(l => l.exerciseName))]
+        totalTonnage: totalVol
       };
 
-      finishedWorkouts.push(workoutSummary);
+      finishedWorkouts.push(summary);
       saveFinishedWorkoutsToStorage();
-
-      alert(`🎉 Treino ${workoutSummary.category} Finalizado com Sucesso!\n\n• Séries salvas hoje: ${totalSets}\n• Volume total levantado: ${totalVolume.toFixed(0)} kg\n\nExcelente trabalho! O resumo foi salvo no seu histórico.`);
+      alert(`Treino ${summary.category} Concluído!\n\n• Séries hoje: ${totalSets}\n• Volume: ${totalVol.toFixed(0)} kg\n\nResumo gravado no histórico.`);
       switchTab('historico');
     }
 
-    // RECUPERA O ÚLTIMO REGISTRO DO EXERCÍCIO
+    // EXPORTAR DADOS EM CSV (COMPATÍVEL COM EXCEL / SHEETS)
+    function exportHistoryCSV() {
+      if (workoutLogs.length === 0) {
+        alert("Nenhuma série salva para exportar.");
+        return;
+      }
+
+      let csv = "Data,Horario,Exercicio,Categoria,Carga_kg,Reps,Volume_kg\n";
+      workoutLogs.forEach(l => {
+        const d = new Date(l.timestamp);
+        const dataStr = d.toLocaleDateString("pt-BR");
+        const horaStr = d.toLocaleTimeString("pt-BR", {hour: '2-digit', minute:'2-digit'});
+        csv += `"${dataStr}","${horaStr}","${l.exerciseName}","${l.category}",${l.weight},${l.reps},${l.volume || (l.weight * l.reps)}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `historico_treinos_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // RECUPERA ÚLTIMO REGISTRO
     function getLastLog(exId) {
       const matches = workoutLogs.filter(l => l.exerciseId === exId);
       return matches.length > 0 ? matches[matches.length - 1] : null;
     }
 
-    // RENDERIZAÇÃO DA LISTA DE EXERCÍCIOS
+    // RENDERIZAÇÃO
     function renderExerciseList() {
       const container = document.getElementById("exercise-list");
       document.getElementById("total-count").textContent = appExercises.length;
@@ -669,9 +743,8 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-10 bg-slate-900 border border-slate-800 rounded-2xl">
-            <i class="fa-solid fa-dumbbell text-slate-600 text-3xl mb-2"></i>
-            <p class="text-xs font-semibold text-slate-400">Nenhum exercício nesta categoria.</p>
+          <div class="text-center py-10 bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 text-xs">
+            Nenhum exercício nesta categoria.
           </div>`;
         return;
       }
@@ -681,12 +754,10 @@
         const lastWeight = last ? last.weight : "";
         const lastReps = last ? last.reps : "";
         const lastDate = last ? new Date(last.timestamp).toLocaleDateString("pt-BR", {day:'2-digit', month:'2-digit'}) : "";
-
         const imgSrc = ex.customBase64 || ex.imagePath || `imagens/${ex.name}.png`;
 
         return `
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg shadow-black/20">
-            
             <div class="flex items-start justify-between gap-3">
               <div class="flex-1">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -695,24 +766,17 @@
                     ${ex.defaultSetsReps || "3-4 séries"}
                   </span>
                 </div>
-                <p class="text-xs text-slate-400 mt-0.5">${ex.muscle || "Músculo alvo"}</p>
+                <p class="text-xs text-slate-400 mt-0.5">${ex.muscle || "Hipertrofia"}</p>
               </div>
 
-              <!-- MINIATURA COM CLIQUE PARA ABRIR EM TELA CHEIA -->
-              <button onclick="openImageModal('${ex.id}')" class="relative w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex-shrink-0 group active:scale-95 transition">
-                <img 
-                  src="${imgSrc}" 
-                  alt="${ex.name}" 
-                  class="w-full h-full object-cover" 
-                  onerror="handleImageErrorFallback(this, '${ex.name}')" 
-                />
-                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-70 group-hover:opacity-100">
+              <button onclick="openImageModal('${ex.id}')" class="relative w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex-shrink-0 active:scale-95 transition">
+                <img src="${imgSrc}" alt="${ex.name}" class="w-full h-full object-cover" onerror="handleImageErrorFallback(this, '${ex.name}')" />
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-70">
                   <i class="fa-solid fa-expand text-white text-xs"></i>
                 </div>
               </button>
             </div>
 
-            <!-- MEMÓRIA DE CARGA DA SEMANA ANTERIOR -->
             <div class="flex items-center justify-between px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs">
               <div class="flex items-center gap-1.5 text-slate-300">
                 <i class="fa-solid fa-clock-rotate-left text-blue-400 text-[11px]"></i>
@@ -722,64 +786,41 @@
               ${last ? `<span class="text-[10px] font-semibold text-slate-500">${lastDate}</span>` : ''}
             </div>
 
-            <!-- CONTROLES NUMÉRICOS COM BOTÕES + E - -->
             <div class="grid grid-cols-12 gap-2 items-center pt-1">
-              
-              <!-- CARGA COM STEPPERS -->
               <div class="col-span-5">
                 <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Carga (kg)</label>
                 <div class="flex items-center bg-slate-950 border border-slate-700 rounded-xl overflow-hidden">
                   <button onclick="stepInput('weight-${ex.id}', -2)" class="w-8 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">-</button>
-                  <input 
-                    type="number" 
-                    id="weight-${ex.id}" 
-                    step="0.5" 
-                    value="${lastWeight || ''}" 
-                    placeholder="${lastWeight || '0'}" 
-                    class="w-full bg-transparent text-center font-extrabold text-sm text-white focus:outline-none" 
-                  />
+                  <input type="number" id="weight-${ex.id}" step="0.5" value="${lastWeight || ''}" placeholder="${lastWeight || '0'}" class="w-full bg-transparent text-center font-extrabold text-sm text-white focus:outline-none" />
                   <button onclick="stepInput('weight-${ex.id}', 2)" class="w-8 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">+</button>
                 </div>
               </div>
 
-              <!-- REPETIÇÕES COM STEPPERS -->
               <div class="col-span-4">
                 <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Reps</label>
                 <div class="flex items-center bg-slate-950 border border-slate-700 rounded-xl overflow-hidden">
                   <button onclick="stepInput('reps-${ex.id}', -1)" class="w-7 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">-</button>
-                  <input 
-                    type="number" 
-                    id="reps-${ex.id}" 
-                    value="${lastReps || ''}" 
-                    placeholder="${lastReps || '10'}" 
-                    class="w-full bg-transparent text-center font-extrabold text-sm text-white focus:outline-none" 
-                  />
+                  <input type="number" id="reps-${ex.id}" value="${lastReps || ''}" placeholder="${lastReps || '10'}" class="w-full bg-transparent text-center font-extrabold text-sm text-white focus:outline-none" />
                   <button onclick="stepInput('reps-${ex.id}', 1)" class="w-7 py-2 text-slate-400 hover:text-white bg-slate-900 active:bg-slate-800 text-xs font-bold">+</button>
                 </div>
               </div>
 
-              <!-- BOTÃO SALVAR SÉRIE -->
               <div class="col-span-3 flex items-end">
-                <button 
-                  onclick="recordSet('${ex.id}', '${ex.name}')" 
-                  class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-1 shadow-lg shadow-blue-600/20 transition">
+                <button onclick="recordSet('${ex.id}', '${ex.name}')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-1 shadow-lg shadow-blue-600/20 transition">
                   <i class="fa-solid fa-check"></i>
                   <span>Salvar</span>
                 </button>
               </div>
-
             </div>
 
             <div id="feedback-${ex.id}" class="hidden text-center py-1 text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 rounded-lg">
               ✓ Série registrada e cronômetro iniciado!
             </div>
-
           </div>
         `;
       }).join("");
     }
 
-    // AJUSTA VALOR NUMÉRICO (+ ou -)
     function stepInput(inputId, delta) {
       const input = document.getElementById(inputId);
       let val = parseFloat(input.value);
@@ -788,14 +829,12 @@
       input.value = val;
     }
 
-    // REGISTRO DE SÉRIE
     function recordSet(exId, exName) {
       const wInput = document.getElementById(`weight-${exId}`);
       const rInput = document.getElementById(`reps-${exId}`);
 
       let w = parseFloat(wInput.value);
       let r = parseInt(rInput.value);
-
       if (isNaN(w)) w = parseFloat(wInput.placeholder) || 0;
       if (isNaN(r)) r = parseInt(rInput.placeholder) || 10;
 
@@ -813,22 +852,17 @@
       workoutLogs.push(entry);
       saveLogsToStorage();
 
-      // Mostra feedback rápido
       const fb = document.getElementById(`feedback-${exId}`);
       if (fb) {
         fb.classList.remove("hidden");
         setTimeout(() => fb.classList.add("hidden"), 2000);
       }
 
-      // Inicia automaticamente o descanso de 90s
       setAndStartTimer(90);
-
-      // Re-renderiza para atualizar o badge com os novos valores
       renderExerciseList();
       populateHistoryFilter();
     }
 
-    // CONTINGÊNCIA DE IMAGEM
     function handleImageErrorFallback(imgEl, exName) {
       imgEl.onerror = null;
       imgEl.parentElement.innerHTML = `
@@ -839,7 +873,6 @@
       `;
     }
 
-    // MODAL DE IMAGEM
     function openImageModal(exId) {
       const ex = appExercises.find(e => e.id === exId);
       if (!ex) return;
@@ -861,13 +894,11 @@
     }
 
     function closeImageModal() {
-      const m = document.getElementById("image-modal");
-      m.classList.add("hidden");
-      m.classList.remove("flex");
+      document.getElementById("image-modal").classList.add("hidden");
+      document.getElementById("image-modal").classList.remove("flex");
       activeModalEx = null;
     }
 
-    // FOTO DIRETA PELO CELULAR
     function uploadCustomImageForModal(input) {
       if (!input.files || !input.files[0] || !activeModalEx) return;
       const file = input.files[0];
@@ -878,22 +909,19 @@
         saveExercisesToStorage();
         document.getElementById("modal-img").src = b64;
         renderExerciseList();
-        alert(`Imagem de "${activeModalEx.name}" salva com sucesso no seu dispositivo!`);
+        alert(`Imagem de "${activeModalEx.name}" salva com sucesso!`);
       };
       reader.readAsDataURL(file);
     }
 
-    // CADASTRAR EXERCÍCIO
     function openNewExerciseModal() {
-      const m = document.getElementById("new-exercise-modal");
-      m.classList.remove("hidden");
-      m.classList.add("flex");
+      document.getElementById("new-exercise-modal").classList.remove("hidden");
+      document.getElementById("new-exercise-modal").classList.add("flex");
     }
 
     function closeNewExerciseModal() {
-      const m = document.getElementById("new-exercise-modal");
-      m.classList.add("hidden");
-      m.classList.remove("flex");
+      document.getElementById("new-exercise-modal").classList.add("hidden");
+      document.getElementById("new-exercise-modal").classList.remove("flex");
     }
 
     function saveNewExercise() {
@@ -911,7 +939,12 @@
       }
 
       const exId = "ex_" + Date.now();
-      const imagePath = filename ? (filename.startsWith("imagens/") ? filename : `imagens/${filename}`) : `imagens/${name}.png`;
+      let imagePath = filename;
+      if (filename && !filename.startsWith("http") && !filename.startsWith("imagens/")) {
+        imagePath = `imagens/${filename}`;
+      } else if (!filename) {
+        imagePath = `imagens/${name}.png`;
+      }
 
       const commit = (b64 = null) => {
         appExercises.push({
@@ -931,7 +964,6 @@
         updateCategoryButtonsUI();
         renderExerciseList();
         populateHistoryFilter();
-        alert(`Exercício "${name}" adicionado!`);
       };
 
       if (fileInput.files && fileInput.files[0]) {
@@ -943,7 +975,6 @@
       }
     }
 
-    // NAVEGAÇÃO ENTRE ABAS
     function switchTab(tab) {
       document.getElementById("view-treino").classList.toggle("hidden", tab !== "treino");
       document.getElementById("view-historico").classList.toggle("hidden", tab !== "historico");
@@ -979,7 +1010,6 @@
       });
     }
 
-    // HISTÓRICO
     function populateHistoryFilter() {
       const s = document.getElementById("filter-history-exercise");
       if (!s) return;
@@ -1002,10 +1032,7 @@
       if (fVal !== "all") list = list.filter(l => l.exerciseId === fVal);
 
       if (list.length === 0) {
-        container.innerHTML = `
-          <div class="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 text-xs">
-            Nenhuma série registrada ainda.
-          </div>`;
+        container.innerHTML = `<div class="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 text-xs">Nenhuma série registrada ainda.</div>`;
         return;
       }
 
