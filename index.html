@@ -61,7 +61,7 @@
     </div>
   </header>
 
-  <!-- CRONÔMETRO ESTILIZADO -->
+  <!-- CRONÔMETRO REESTRUTURADO (MAIOR & BOTÃO PARAR EMBAIXO) -->
   <div class="max-w-md mx-auto px-4 pt-3">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xl shadow-slate-200/50 dark:shadow-black/40 space-y-3 transition-colors">
       <div class="flex items-center justify-between">
@@ -72,18 +72,24 @@
         <span id="timer-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Pronto</span>
       </div>
 
-      <div class="flex items-center justify-between">
+      <!-- Display do Tempo + Botões Rápidos de Duração -->
+      <div class="flex items-center justify-between gap-2">
         <div class="flex items-baseline gap-1">
-          <div id="timer-large-display" class="text-4xl font-black font-mono text-slate-900 dark:text-white tracking-tight">00:00</div>
-          <span class="text-[10px] text-slate-400 font-semibold uppercase">min:seg</span>
+          <div id="timer-large-display" class="text-5xl font-black font-mono text-slate-900 dark:text-white tracking-tight">00:00</div>
+          <span class="text-[10px] text-slate-400 font-semibold uppercase">min:s</span>
         </div>
         <div class="flex items-center gap-1.5">
-          <button onclick="startTimer(60)" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">60s</button>
-          <button onclick="startTimer(90)" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">90s</button>
-          <button onclick="startTimer(120)" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">120s</button>
-          <button onclick="stopTimer()" class="w-9 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 flex items-center justify-center text-xs active:scale-95 transition"><i class="fa-solid fa-stop"></i></button>
+          <button onclick="startTimer(60)" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">60s</button>
+          <button onclick="startTimer(90)" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">90s</button>
+          <button onclick="startTimer(120)" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">120s</button>
         </div>
       </div>
+
+      <!-- Botão Parar posicionado na parte inferior do card -->
+      <button onclick="stopTimer()" class="w-full py-2 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-[0.98] transition">
+        <i class="fa-solid fa-stop"></i>
+        <span>Parar Descanso</span>
+      </button>
     </div>
   </div>
 
@@ -116,43 +122,81 @@
       <div id="history-list" class="space-y-2"></div>
     </section>
 
-    <!-- VIEW 3: NUTRIÇÃO -->
+    <!-- VIEW 3: NUTRIÇÃO VISUAL (POR PESO EM GRAMAS COM PRÉ E PÓS-TREINO) -->
     <section id="view-nutricao" class="hidden space-y-4">
+      <!-- Metas de Macronutrientes por Peso -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-extrabold">Metas Diárias (~3.000 kcal)</h2>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">Hipertrofia</span>
+          <h2 class="text-sm font-extrabold">Metas Diárias em Gramas</h2>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">Peso Limpo</span>
         </div>
         <div class="grid grid-cols-3 gap-2 text-center">
           <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80">
             <span class="text-[10px] uppercase font-bold text-blue-500 block">Proteína</span>
             <span class="text-base font-black">160g</span>
-            <span class="text-[9px] text-slate-400 block">~640 kcal</span>
+            <span class="text-[9px] text-slate-400 block">Carnes, Ovos, Whey</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80">
             <span class="text-[10px] uppercase font-bold text-amber-500 block">Carbos</span>
             <span class="text-base font-black">400g</span>
-            <span class="text-[9px] text-slate-400 block">~1.600 kcal</span>
+            <span class="text-[9px] text-slate-400 block">Arroz, Batata, Aveia</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80">
             <span class="text-[10px] uppercase font-bold text-emerald-500 block">Gorduras</span>
             <span class="text-base font-black">85g</span>
-            <span class="text-[9px] text-slate-400 block">~765 kcal</span>
+            <span class="text-[9px] text-slate-400 block">Azeite, Ovos, Pastas</span>
           </div>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-2.5">
-        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Checklist do Dia</h3>
-        <div id="meals-container" class="space-y-2"></div>
+      <!-- PRÉ E PÓS-TREINO -->
+      <div class="space-y-2">
+        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Timing do Treino</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-900/40 p-3 rounded-2xl space-y-1">
+            <div class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+              <i class="fa-solid fa-bolt text-xs"></i>
+              <span class="text-xs font-extrabold">Pré-Treino</span>
+            </div>
+            <p class="text-[10px] text-slate-400">60-90 min antes</p>
+            <ul class="text-[11px] space-y-1 text-slate-600 dark:text-slate-300 font-medium pt-1">
+              <li>• 150g banana fatiada</li>
+              <li>• 40g aveia em flocos</li>
+              <li>• 15g mel ou 30g doce de leite</li>
+              <li>• 1 xícara de café preto sem açúcar</li>
+            </ul>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900/40 p-3 rounded-2xl space-y-1">
+            <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+              <i class="fa-solid fa-rotate text-xs"></i>
+              <span class="text-xs font-extrabold">Pós-Treino</span>
+            </div>
+            <p class="text-[10px] text-slate-400">Até 60 min após</p>
+            <ul class="text-[11px] space-y-1 text-slate-600 dark:text-slate-300 font-medium pt-1">
+              <li>• 30g a 40g Whey Protein</li>
+              <li>• 200g banana ou 250g melancia</li>
+              <li>• 5g Creatina com água</li>
+              <li>• 500ml de água mineral</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
+      <!-- REFEIÇÕES DO DIA COM OPÇÕES POR PESO -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
+        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Pratos & Opções do Dia (Por Gramas)</h3>
+        <div id="meals-container" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Guia Visual da Mão -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-2 text-xs">
         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Guia Sem Balança</h3>
         <ul class="space-y-1.5 text-slate-600 dark:text-slate-300">
-          <li>✋ <strong>Palma da Mão:</strong> ~150g de carne, frango ou peixe (~32g proteína)</li>
-          <li>✊ <strong>Punho Fechado:</strong> ~100g de arroz, feijão ou batata</li>
-          <li>👍 <strong>Polegar:</strong> ~15g de azeite ou pasta de amendoim (~12g gordura)</li>
+          <li>✋ <strong>Palma da Mão:</strong> ~150g de carne bovina, peito de frango ou tilápia</li>
+          <li>✊ <strong>Punho Fechado:</strong> ~100g de arroz cozido, mandioca ou batata</li>
+          <li>👍 <strong>Polegar:</strong> ~15g de azeite de oliva ou pasta de amendoim</li>
+          <li>👐 <strong>Duas Mãos em Concha:</strong> ~150g de vegetais variados</li>
         </ul>
       </div>
     </section>
@@ -191,7 +235,7 @@
   </nav>
 
   <script>
-    // URL DA SUA PONTE DO GOOGLE APPS SCRIPT
+    // URL DA PONTE DO GOOGLE APPS SCRIPT
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9NkaYvRdVIEbysoYwOG9Xz2DCvM4axyMJj9ozqTMWwDnSBpgJPGRB--wjsWYgvN_k/exec";
 
     const EXERCISES = [
@@ -269,17 +313,18 @@
               <strong class="text-blue-600 dark:text-blue-400">${lastTxt}</strong>
             </div>
 
+            <!-- Inputs Numéricos (KG de 1 em 1) -->
             <div class="grid grid-cols-12 gap-1.5 items-center">
               <div class="col-span-5 flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-                <button onclick="stepVal('w_${e.id}', -2)" class="w-7 py-2 text-xs font-bold text-slate-400">-</button>
+                <button onclick="stepVal('w_${e.id}', -1)" class="w-7 py-2 text-xs font-bold text-slate-400 active:bg-slate-200 dark:active:bg-slate-800">-</button>
                 <input type="number" id="w_${e.id}" placeholder="${last ? last.weight : 'kg'}" class="w-full bg-transparent text-center text-xs font-bold focus:outline-none" />
-                <button onclick="stepVal('w_${e.id}', 2)" class="w-7 py-2 text-xs font-bold text-slate-400">+</button>
+                <button onclick="stepVal('w_${e.id}', 1)" class="w-7 py-2 text-xs font-bold text-slate-400 active:bg-slate-200 dark:active:bg-slate-800">+</button>
               </div>
 
               <div class="col-span-4 flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-                <button onclick="stepVal('r_${e.id}', -1)" class="w-6 py-2 text-xs font-bold text-slate-400">-</button>
+                <button onclick="stepVal('r_${e.id}', -1)" class="w-6 py-2 text-xs font-bold text-slate-400 active:bg-slate-200 dark:active:bg-slate-800">-</button>
                 <input type="number" id="r_${e.id}" placeholder="${last ? last.reps : '10'}" class="w-full bg-transparent text-center text-xs font-bold focus:outline-none" />
-                <button onclick="stepVal('r_${e.id}', 1)" class="w-6 py-2 text-xs font-bold text-slate-400">+</button>
+                <button onclick="stepVal('r_${e.id}', 1)" class="w-6 py-2 text-xs font-bold text-slate-400 active:bg-slate-200 dark:active:bg-slate-800">+</button>
               </div>
 
               <div class="col-span-3">
@@ -291,6 +336,7 @@
       }).join("");
     }
 
+    // Altera de 1 em 1
     function stepVal(id, delta) {
       const el = document.getElementById(id);
       let v = parseFloat(el.value);
@@ -314,14 +360,12 @@
         time: new Date().toLocaleTimeString("pt-BR", {hour:'2-digit', minute:'2-digit'})
       };
 
-      // 1. Salva localmente para resposta instantânea
       logs.push(log);
       localStorage.setItem("it_logs", JSON.stringify(logs));
       startTimer(90);
       renderCards();
       renderHistory();
 
-      // 2. Dispara gravação na planilha usando text/plain para evitar bloqueio de CORS
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith("http")) {
         fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
@@ -329,7 +373,7 @@
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(log)
         })
-        .then(() => console.log("Série enviada para a planilha com sucesso!"))
+        .then(() => console.log("Série gravada na planilha com sucesso!"))
         .catch(err => console.error("Erro ao enviar:", err));
       }
     }
@@ -430,22 +474,65 @@
       a.click();
     }
 
+    // LISTA EXPANDIDA DE REFEIÇÕES POR PESO (GRAMAS) E OPÇÕES DE PRATOS
     function renderMeals() {
       const meals = [
-        { t: "Café da Manhã (~600 kcal)", d: "3 ovos + 2 fatias pão integral + banana com aveia" },
-        { t: "Almoço (~850 kcal)", d: "180g arroz + 100g feijão + 180g frango/carne + salada" },
-        { t: "Lanche Pré-Treino (~450 kcal)", d: "Shake whey com banana e aveia / pasta de amendoim" },
-        { t: "Jantar (~800 kcal)", d: "200g batata/arroz + 180g peixe/carne + legumes" },
-        { t: "Ceia (~300 kcal)", d: "Iogurte com castanhas ou fruta" }
+        {
+          title: "Café da Manhã",
+          options: [
+            "Opção 1: 3 a 4 ovos inteiros mexidos + 60g pão integral + 120g banana com 30g aveia",
+            "Opção 2: Panqueca de 3 ovos batidos com 50g aveia em flocos + 150g mamão ou morangos picados",
+            "Opção 3: 200g iogurte natural desnatado + 40g granola sem açúcar + 30g pasta de amendoim"
+          ]
+        },
+        {
+          title: "Almoço",
+          options: [
+            "Opção 1: 180g peito de frango grelhado + 180g arroz branco/integral + 100g feijão carioca + salada verde à vontade",
+            "Opção 2: 170g patinho bovino moído + 220g mandioca cozida ou purê de batata + 1 fio de azeite (10g)",
+            "Opção 3: 190g filé de tilápia grelhada + 200g batata-doce assada + 100g legumes cozidos (brócolis e cenoura)"
+          ]
+        },
+        {
+          title: "Lanche da Tarde",
+          options: [
+            "Opção 1: 30g Whey Protein batido com 200ml leite integral ou vegetal + 40g aveia + 100g banana",
+            "Opção 2: Sanduíche com 50g pão sírio/integral + 100g frango desfiado com 20g ricota ou requeijão light",
+            "Opção 3: 40g tapioca recheada com 2 ovos mexidos + 1 fatia de queijo branco (30g)"
+          ]
+        },
+        {
+          title: "Jantar",
+          options: [
+            "Opção 1: 180g sobrecoxa desossada sem pele + 180g arroz + 100g feijão + folhas verdes",
+            "Opção 2: 170g carne vermelha magra (alcatra/patinho) + 250g batata inglesa assada com orégano e azeite",
+            "Opção 3: Omelete de 3 ovos inteiros com 80g queijo minas + 200g abóbora cabotiá cozida"
+          ]
+        },
+        {
+          title: "Ceia Noturna",
+          options: [
+            "Opção 1: 170g iogurte natural integral + 25g castanhas-do-pará ou nozes",
+            "Opção 2: 30g caseína ou whey com 25g pasta de amendoim integral",
+            "Opção 3: 150g abacate fatiado com canela em pó e gotas de limão"
+          ]
+        }
       ];
+
       document.getElementById("meals-container").innerHTML = meals.map((m, i) => `
-        <label class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 cursor-pointer">
-          <input type="checkbox" class="mt-0.5 rounded text-blue-600 w-3.5 h-3.5" />
-          <div>
-            <div class="text-xs font-bold leading-tight">${m.t}</div>
-            <div class="text-[10px] text-slate-400">${m.d}</div>
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-blue-600 dark:text-blue-400">${m.title}</span>
+            <input type="checkbox" class="w-4 h-4 rounded text-blue-600 bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 cursor-pointer" />
           </div>
-        </label>
+          <div class="space-y-1.5 pl-0.5">
+            ${m.options.map(opt => `
+              <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300 border-l-2 border-slate-200 dark:border-slate-800 pl-2">
+                ${opt}
+              </p>
+            `).join("")}
+          </div>
+        </div>
       `).join("");
     }
 
