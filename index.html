@@ -242,7 +242,7 @@
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9NkaYvRdVIEbysoYwOG9Xz2DCvM4axyMJj9ozqTMWwDnSBpgJPGRB--wjsWYgvN_k/exec";
 
-    // CATÁLOGO COMPLETO SINCRONIZADO COM AS MÁQUINAS DA SUA ACADEMIA
+    // CATÁLOGO COMPLETO - LOMBAR SEGURA (PULL-02 COM PEITO APOIADO)
     const EXERCISES = [
       // PUSH (A)
       { id: "push-01", cat: "push", name: "Supino Reto com Barra", muscle: "Peitoral Maior, Tríceps", sets: "4 x 6-10", img: "Imagens/Supino.png", desc: "Escápulas travadas no banco. Desça a barra no terço inferior do peito." },
@@ -252,21 +252,21 @@
       { id: "push-04", cat: "push", name: "Tríceps Corda no Pulley", muscle: "Tríceps Braquial", sets: "3 x 10-15", img: "Imagens/Tríceps.png", desc: "Cotovelos colados ao lado do corpo. Abra a corda na extensão final." },
       { id: "push-05", cat: "push", name: "Flexão de Braço (Push-up)", muscle: "Peitoral e Core", sets: "3 x Até a Falha", img: "Imagens/flexao.png", desc: "Corpo alinhado em prancha sem deixar o quadril ceder." },
       
-      // PULL (B)
+      // PULL (B) - 100% PROTEGIDO PARA A LOMBAR
       { id: "pull-01", cat: "pull", name: "Puxada Frontal no Pulley", muscle: "Latíssimo do Dorso, Bíceps", sets: "4 x 6-10", img: "Imagens/puxada.png", desc: "Puxe direcionando cotovelos para baixo e para trás com o peito aberto." },
-      { id: "pull-02", cat: "pull", name: "Remada Curvada com Barra", muscle: "Dorsais, Trapézio, Romboides", sets: "4 x 8-12", img: "Imagens/remada-curvada.png", desc: "Tronco a 45°, coluna lombar neutra e travada." },
-      { id: "pull-03", cat: "pull", name: "Remada Unilateral (Serrote)", muscle: "Dorsais e Romboides", sets: "3 x 10-12", img: "Imagens/serrote.png", desc: "Apoio estável no banco. Puxe o halter direcionando ao quadril." },
-      { id: "pull-04", cat: "pull", name: "Rosca Direta com Barra", muscle: "Bíceps Braquial", sets: "3 x 10-15", img: "Imagens/rosca.png", desc: "Sem balanço lombar. Controle a fase excêntrica de descida." },
+      { id: "pull-02", cat: "pull", name: "Remada no Banco Inclinado (Peito Apoiado)", muscle: "Dorsais, Trapézio e Romboides", sets: "4 x 8-12", img: "Imagens/remada-banco.png", desc: "Peito totalmente apoiado no banco a ~30-45°. Puxe os halteres focando em esmagar as escápulas, lombar 100% livre de carga." },
+      { id: "pull-03", cat: "pull", name: "Remada Unilateral (Serrote)", muscle: "Dorsais e Romboides", sets: "3 x 10-12", img: "Imagens/serrote.png", desc: "Apoio bem firme com joelho e mão no banco reto. Puxe direcionando o halter para o quadril sem girar o tronco." },
+      { id: "pull-04", cat: "pull", name: "Rosca Direta com Barra", muscle: "Bíceps Braquial", sets: "3 x 10-15", img: "Imagens/rosca.png", desc: "Costas retas ou apoiadas na parede para evitar balanço lombar. Controle a descida." },
 
       // LEGS (C) - PERNAS COMPLETAS
-      { id: "legs-01", cat: "legs", name: "Agachamento Livre (Back Squat)", muscle: "Quadríceps, Glúteos, Core", sets: "4 x 6-10", img: "Imagens/agachamento.png", desc: "Pés na largura dos ombros, joelhos alinhados com a ponta dos pés." },
-      { id: "legs-02", cat: "legs", name: "Levantamento Terra Romeno (RDL)", muscle: "Posteriores de Coxa e Glúteos", sets: "3 x 8-12", img: "Imagens/rdl.png", desc: "Empurre o quadril para trás mantendo os joelhos semiflexionados." },
+      { id: "legs-01", cat: "legs", name: "Agachamento Livre (Back Squat)", muscle: "Quadríceps, Glúteos, Core", sets: "4 x 6-10", img: "Imagens/agachamento.png", desc: "Pés na largura dos ombros, joelhos alinhados com a ponta dos pés. Manter o tronco firme." },
+      { id: "legs-02", cat: "legs", name: "Levantamento Terra Romeno (RDL)", muscle: "Posteriores de Coxa e Glúteos", sets: "3 x 8-12", img: "Imagens/rdl.png", desc: "Empurre o quadril para trás mantendo os joelhos semiflexionados. Pare ao sentir alongar o posterior sem curvar as costas." },
       { id: "legs-03", cat: "legs", name: "Leg Horizontal Sentado", muscle: "Quadríceps e Glúteos", sets: "3 x 10-12", img: "Imagens/leg-horizontal.png", desc: "Pés paralelos na plataforma. Empurre com o calcanhar sem travar totalmente os joelhos." },
       { id: "legs-04", cat: "legs", name: "Cadeira Extensora", muscle: "Quadríceps Isolado", sets: "3 x 12-15", img: "Imagens/extensora.png", desc: "Segure 1 segundo no topo da contração máxima." },
       { id: "legs-06", cat: "legs", name: "Cadeira Adutora / Abdutora Conjugada", muscle: "Glúteo Médio e Adutores", sets: "3 x 12-15", img: "Imagens/adutora-abdutora.png", desc: "Costas bem encostadas; execute movimentos controlados sem soltar as placas bruscamente." },
       { id: "legs-05", cat: "legs", name: "Panturrilha em Pé", muscle: "Gastrocnêmio e Sóleo", sets: "4 x 15-20", img: "Imagens/panturrilha.png", desc: "Alongamento total na descida e contração forte na ponta dos pés." },
 
-      // OUTROS / CORE & FUNCIONAL (SEM PERNA AQUI)
+      // OUTROS / CORE & FUNCIONAL
       { id: "core-00", cat: "outros", name: "Abdominal Tradicional no Solo (Crunch)", muscle: "Reto Abdominal", sets: "3 x 15-20", img: "Imagens/crunch.png", desc: "Deitado no colchonete, flexione a coluna enrolando o abdômen sem puxar o pescoço." },
       { id: "func-03", cat: "outros", name: "Elevação de Pernas (Leg Raise)", muscle: "Abdômen Inferior e Core", sets: "3 x 15-20", img: "Imagens/leg-raise.png", desc: "Lombar colada no chão, suba com controle sem jogar o quadril." },
       { id: "core-02", cat: "outros", name: "Abdominal Supra na Polia (Cable Crunch)", muscle: "Reto Abdominal (Carga)", sets: "4 x 10-12", img: "Imagens/cable-crunch.png", desc: "Ajoelhe no crossover, segure a corda e enrole o tronco direcionando cotovelos aos joelhos." },
@@ -280,7 +280,7 @@
     let completedExercises = JSON.parse(localStorage.getItem("it_completed_today") || "{}");
     let timerTarget = null, timerInterval = null, audioCtx = null;
 
-    // SISTEMA DE RESET DIÁRIO (24h baseado na data de hoje)
+    // RESET DIÁRIO AUTOMÁTICO (24h)
     function checkDailyReset() {
       const today = new Date().toLocaleDateString("pt-BR");
       const savedDate = localStorage.getItem("it_completed_date");
@@ -328,7 +328,6 @@
         const lastTxt = last ? `${last.weight} kg × ${last.reps} reps` : "Nenhum registro";
         const isDone = !!completedExercises[e.id];
 
-        // Se salvo hoje: verde esmeralda com destaque visual
         const cardBg = isDone
           ? "bg-emerald-50/80 dark:bg-emerald-950/20 border-emerald-500/50 dark:border-emerald-700/60 shadow-md shadow-emerald-500/5"
           : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm";
@@ -407,7 +406,6 @@
         time: new Date().toLocaleTimeString("pt-BR", {hour:'2-digit', minute:'2-digit'})
       };
 
-      // Marca o card como concluído hoje
       completedExercises[id] = true;
       localStorage.setItem("it_completed_today", JSON.stringify(completedExercises));
       localStorage.setItem("it_completed_date", log.date);
