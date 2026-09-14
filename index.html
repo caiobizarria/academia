@@ -45,7 +45,6 @@
   <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 transition-colors">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <!-- Logo do App com Fallback Automático -->
         <img 
           src="Imagens/logo.png" 
           alt="Logo IronTracker" 
@@ -73,7 +72,7 @@
     </div>
   </header>
 
-  <!-- CRONÔMETRO COM DISPLAY EXPANDIDO E LINHA UNIFICADA DE BOTÕES -->
+  <!-- CRONÔMETRO EXPANDIDO COM LINHA UNIFICADA -->
   <div class="max-w-md mx-auto px-4 pt-3">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xl shadow-slate-200/50 dark:shadow-black/40 space-y-3 transition-colors">
       <div class="flex items-center justify-between">
@@ -84,13 +83,11 @@
         <span id="timer-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Pronto</span>
       </div>
 
-      <!-- Visor Maior Centralizado -->
       <div class="flex items-baseline justify-center gap-1 py-1">
         <div id="timer-large-display" class="text-5xl font-black font-mono text-slate-900 dark:text-white tracking-tight">00:00</div>
         <span class="text-[10px] text-slate-400 font-bold uppercase">min:s</span>
       </div>
 
-      <!-- Linha Unificada: 60s, 90s, 120s e Parar Vermelho Vivo -->
       <div class="grid grid-cols-12 gap-1.5 pt-1">
         <button onclick="startTimer(60)" class="col-span-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">60s</button>
         <button onclick="startTimer(90)" class="col-span-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold active:bg-blue-600 active:text-white transition">90s</button>
@@ -243,14 +240,14 @@
   </nav>
 
   <script>
-    // URL OFICIAL DA SUA PONTE COM O GOOGLE SHEETS
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9NkaYvRdVIEbysoYwOG9Xz2DCvM4axyMJj9ozqTMWwDnSBpgJPGRB--wjsWYgvN_k/exec";
 
-    // LISTA DE EXERCÍCIOS 100% SINCRONIZADA COM A PLANILHA DO GOOGLE SHEETS
+    // CATÁLOGO COMPLETO SINCRONIZADO COM AS MÁQUINAS DA SUA ACADEMIA
     const EXERCISES = [
       // PUSH (A)
       { id: "push-01", cat: "push", name: "Supino Reto com Barra", muscle: "Peitoral Maior, Tríceps", sets: "4 x 6-10", img: "Imagens/Supino.png", desc: "Escápulas travadas no banco. Desça a barra no terço inferior do peito." },
       { id: "push-02", cat: "push", name: "Desenvolvimento com Halteres", muscle: "Deltoide Anterior e Lateral, Tríceps", sets: "3 x 8-12", img: "Imagens/Desenvolvimento com Halteres.png", desc: "Banco a ~75°. Suba sem bater os halteres no topo." },
+      { id: "push-06", cat: "push", name: "Supino Multi-Press na Máquina", muscle: "Peitoral Maior, Deltoide e Tríceps", sets: "3 x 10-12", img: "Imagens/multi-press.png", desc: "Ajuste a altura do banco para alinhar as pegadas com a linha média do peito." },
       { id: "push-03", cat: "push", name: "Crucifixo Reto com Halteres", muscle: "Peitoral Maior (Alongamento)", sets: "3 x 10-15", img: "Imagens/Crucifixo.png", desc: "Cotovelos levemente fletidos. Sinta o alongamento da fáscia do peito." },
       { id: "push-04", cat: "push", name: "Tríceps Corda no Pulley", muscle: "Tríceps Braquial", sets: "3 x 10-15", img: "Imagens/Tríceps.png", desc: "Cotovelos colados ao lado do corpo. Abra a corda na extensão final." },
       { id: "push-05", cat: "push", name: "Flexão de Braço (Push-up)", muscle: "Peitoral e Core", sets: "3 x Até a Falha", img: "Imagens/flexao.png", desc: "Corpo alinhado em prancha sem deixar o quadril ceder." },
@@ -261,28 +258,41 @@
       { id: "pull-03", cat: "pull", name: "Remada Unilateral (Serrote)", muscle: "Dorsais e Romboides", sets: "3 x 10-12", img: "Imagens/serrote.png", desc: "Apoio estável no banco. Puxe o halter direcionando ao quadril." },
       { id: "pull-04", cat: "pull", name: "Rosca Direta com Barra", muscle: "Bíceps Braquial", sets: "3 x 10-15", img: "Imagens/rosca.png", desc: "Sem balanço lombar. Controle a fase excêntrica de descida." },
 
-      // LEGS (C)
+      // LEGS (C) - PERNAS COMPLETAS
       { id: "legs-01", cat: "legs", name: "Agachamento Livre (Back Squat)", muscle: "Quadríceps, Glúteos, Core", sets: "4 x 6-10", img: "Imagens/agachamento.png", desc: "Pés na largura dos ombros, joelhos alinhados com a ponta dos pés." },
       { id: "legs-02", cat: "legs", name: "Levantamento Terra Romeno (RDL)", muscle: "Posteriores de Coxa e Glúteos", sets: "3 x 8-12", img: "Imagens/rdl.png", desc: "Empurre o quadril para trás mantendo os joelhos semiflexionados." },
-      { id: "legs-03", cat: "legs", name: "Leg Press 45°", muscle: "Quadríceps e Glúteos", sets: "3 x 10-12", img: "Imagens/leg-press.png", desc: "Não trave os joelhos na extensão máxima e não tire a lombar do apoio." },
+      { id: "legs-03", cat: "legs", name: "Leg Horizontal Sentado", muscle: "Quadríceps e Glúteos", sets: "3 x 10-12", img: "Imagens/leg-horizontal.png", desc: "Pés paralelos na plataforma. Empurre com o calcanhar sem travar totalmente os joelhos." },
       { id: "legs-04", cat: "legs", name: "Cadeira Extensora", muscle: "Quadríceps Isolado", sets: "3 x 12-15", img: "Imagens/extensora.png", desc: "Segure 1 segundo no topo da contração máxima." },
+      { id: "legs-06", cat: "legs", name: "Cadeira Adutora / Abdutora Conjugada", muscle: "Glúteo Médio e Adutores", sets: "3 x 12-15", img: "Imagens/adutora-abdutora.png", desc: "Costas bem encostadas; execute movimentos controlados sem soltar as placas bruscamente." },
       { id: "legs-05", cat: "legs", name: "Panturrilha em Pé", muscle: "Gastrocnêmio e Sóleo", sets: "4 x 15-20", img: "Imagens/panturrilha.png", desc: "Alongamento total na descida e contração forte na ponta dos pés." },
 
-      // OUTROS / FUNCIONAL & CORE
-      { id: "func-01", cat: "outros", name: "Wall Sit (Agachamento na Parede)", muscle: "Quadríceps Isométrico", sets: "3 x 45-60s", img: "Imagens/wall-sit.png", desc: "Pernas a 90°, tronco bem apoiado na parede." },
-      { id: "func-02", cat: "outros", name: "Step-Up na Caixa / Banco", muscle: "Glúteos e Pliometria", sets: "3 x 10 cada perna", img: "Imagens/step-up.png", desc: "Impulso controlado focado na perna de apoio." },
-      { id: "func-03", cat: "outros", name: "Elevação de Pernas (Leg Raise)", muscle: "Abdômen e Core", sets: "3 x 15-20", img: "Imagens/leg-raise.png", desc: "Lombar colada no chão, suba com controle sem jogar o quadril." },
-      { id: "core-02", cat: "outros", name: "Abdominal Supra na Polia (Cable Crunch)", muscle: "Reto Abdominal (Carga)", sets: "4 x 10-12", img: "Imagens/cable-crunch.png", desc: "Flexione a coluna levando a cabeça em direção aos joelhos mantendo o quadril fixo." },
-      { id: "core-03", cat: "outros", name: "Prancha Frontal Isométrica", muscle: "Transverso do Abdômen e Core", sets: "3 x 45-60s", img: "Imagens/prancha.png", desc: "Cotovelos alinhados aos ombros, abdômen e glúteos travados em linha reta." },
-      { id: "core-04", cat: "outros", name: "Russian Twist / Oblíquos", muscle: "Oblíquos Internos e Externos", sets: "3 x 15-20", img: "Imagens/russian-twist.png", desc: "Tronco inclinado, calcanhares fora do chão, gire controlando a rotação." },
-      { id: "core-05", cat: "outros", name: "Roda Abdominal (Ab Wheel)", muscle: "Core Total & Anti-Extensão", sets: "3 x 8-12", img: "Imagens/roda-abdominal.png", desc: "Role para frente sem deixar a lombar arquear; retorne contraindo o core." }
+      // OUTROS / CORE & FUNCIONAL (SEM PERNA AQUI)
+      { id: "core-00", cat: "outros", name: "Abdominal Tradicional no Solo (Crunch)", muscle: "Reto Abdominal", sets: "3 x 15-20", img: "Imagens/crunch.png", desc: "Deitado no colchonete, flexione a coluna enrolando o abdômen sem puxar o pescoço." },
+      { id: "func-03", cat: "outros", name: "Elevação de Pernas (Leg Raise)", muscle: "Abdômen Inferior e Core", sets: "3 x 15-20", img: "Imagens/leg-raise.png", desc: "Lombar colada no chão, suba com controle sem jogar o quadril." },
+      { id: "core-02", cat: "outros", name: "Abdominal Supra na Polia (Cable Crunch)", muscle: "Reto Abdominal (Carga)", sets: "4 x 10-12", img: "Imagens/cable-crunch.png", desc: "Ajoelhe no crossover, segure a corda e enrole o tronco direcionando cotovelos aos joelhos." },
+      { id: "core-03", cat: "outros", name: "Prancha Frontal Isométrica", muscle: "Transverso do Abdômen e Core", sets: "3 x 45-60s", img: "Imagens/prancha.png", desc: "Cotovelos alinhados aos ombros, glúteos e abdômen contraídos sem deixar o quadril cair." },
+      { id: "core-04", cat: "outros", name: "Russian Twist / Oblíquos", muscle: "Oblíquos Internos e Externos", sets: "3 x 15-20", img: "Imagens/russian-twist.png", desc: "Sentado, pés suspensos, gire o tronco segurando um peso de um lado ao outro." },
+      { id: "core-05", cat: "outros", name: "Roda Abdominal (Ab Wheel)", muscle: "Core Total & Anti-Extensão", sets: "3 x 8-12", img: "Imagens/roda-abdominal.png", desc: "Role para frente sem deixar a lombar arquear; volte puxando com a força do abdômen." }
     ];
 
     let currentCat = "push";
     let logs = JSON.parse(localStorage.getItem("it_logs") || "[]");
+    let completedExercises = JSON.parse(localStorage.getItem("it_completed_today") || "{}");
     let timerTarget = null, timerInterval = null, audioCtx = null;
 
+    // SISTEMA DE RESET DIÁRIO (24h baseado na data de hoje)
+    function checkDailyReset() {
+      const today = new Date().toLocaleDateString("pt-BR");
+      const savedDate = localStorage.getItem("it_completed_date");
+      if (savedDate !== today) {
+        completedExercises = {};
+        localStorage.setItem("it_completed_today", JSON.stringify({}));
+        localStorage.setItem("it_completed_date", today);
+      }
+    }
+
     window.onload = () => {
+      checkDailyReset();
       if (localStorage.getItem("it_theme") === "light") {
         document.documentElement.classList.remove("dark");
         document.getElementById("theme-icon").className = "fa-solid fa-sun text-sm text-amber-500";
@@ -316,14 +326,29 @@
       container.innerHTML = list.map(e => {
         const last = [...logs].reverse().find(l => l.exerciseId === e.id);
         const lastTxt = last ? `${last.weight} kg × ${last.reps} reps` : "Nenhum registro";
+        const isDone = !!completedExercises[e.id];
+
+        // Se salvo hoje: verde esmeralda com destaque visual
+        const cardBg = isDone
+          ? "bg-emerald-50/80 dark:bg-emerald-950/20 border-emerald-500/50 dark:border-emerald-700/60 shadow-md shadow-emerald-500/5"
+          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm";
+
+        const btnClass = isDone
+          ? "w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 active:scale-95 transition"
+          : "w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-md shadow-blue-600/20 active:scale-95 transition";
+
+        const btnText = isDone ? "Salvo ✓" : "Salvar";
 
         return `
-          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 space-y-3 shadow-sm transition-colors">
+          <div id="card_${e.id}" class="${cardBg} border rounded-2xl p-3.5 space-y-3 transition-colors duration-300">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
                 <div class="flex items-center gap-2">
-                  <h3 class="text-xs font-extrabold">${e.name}</h3>
-                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">${e.sets}</span>
+                  <h3 class="text-xs font-extrabold flex items-center gap-1.5">
+                    ${isDone ? '<i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>' : ''}
+                    <span>${e.name}</span>
+                  </h3>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'} border border-transparent">${e.sets}</span>
                 </div>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">${e.muscle}</p>
               </div>
@@ -332,12 +357,11 @@
               </button>
             </div>
 
-            <div class="px-2.5 py-1 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 rounded-xl flex items-center justify-between text-[11px]">
+            <div class="px-2.5 py-1 ${isDone ? 'bg-emerald-100/50 dark:bg-emerald-900/30 border-emerald-300/40' : 'bg-slate-50 dark:bg-slate-950/80 border-slate-200 dark:border-slate-800/80'} border rounded-xl flex items-center justify-between text-[11px]">
               <span class="text-slate-400">Último treino:</span>
-              <strong class="text-blue-600 dark:text-blue-400">${lastTxt}</strong>
+              <strong class="${isDone ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}">${lastTxt}</strong>
             </div>
 
-            <!-- Ajuste de Carga de 1 em 1 kg -->
             <div class="grid grid-cols-12 gap-1.5 items-center">
               <div class="col-span-5 flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
                 <button onclick="stepVal('w_${e.id}', -1)" class="w-7 py-2 text-xs font-bold text-slate-400 active:bg-slate-200 dark:active:bg-slate-800">-</button>
@@ -352,7 +376,7 @@
               </div>
 
               <div class="col-span-3">
-                <button onclick="saveSet('${e.id}', '${e.name}')" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-extrabold text-xs shadow-md shadow-blue-600/20 transition">Salvar</button>
+                <button onclick="saveSet('${e.id}', '${e.name}')" class="${btnClass}">${btnText}</button>
               </div>
             </div>
           </div>
@@ -382,6 +406,11 @@
         date: new Date().toLocaleDateString("pt-BR"),
         time: new Date().toLocaleTimeString("pt-BR", {hour:'2-digit', minute:'2-digit'})
       };
+
+      // Marca o card como concluído hoje
+      completedExercises[id] = true;
+      localStorage.setItem("it_completed_today", JSON.stringify(completedExercises));
+      localStorage.setItem("it_completed_date", log.date);
 
       logs.push(log);
       localStorage.setItem("it_logs", JSON.stringify(logs));
