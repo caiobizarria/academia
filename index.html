@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>IronTracker — Treino, Cargas & Nutrição</title>
   
-  <!-- ÍCONES E LOGO DO APP -->
-  <link rel="icon" type="image/png" href="Imagens/logo.png" />
-  <link rel="apple-touch-icon" href="Imagens/logo.png" />
+  <link rel="icon" type="image/png" href="imagens/logo.png" />
+  <link rel="apple-touch-icon" href="imagens/logo.png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -41,15 +40,15 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen pb-32 transition-colors duration-200">
 
-  <!-- HEADER NATIVO COM SUPORTE A LOGO -->
+  <!-- HEADER -->
   <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 transition-colors">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <img 
-          src="Imagens/logo.png" 
+          src="imagens/logo.png" 
           alt="Logo IronTracker" 
           class="w-9 h-9 rounded-xl object-contain border border-slate-200 dark:border-slate-800 p-0.5 bg-slate-100 dark:bg-slate-900 shadow-sm"
-          onerror="if(!this.dataset.retried){this.dataset.retried=true; this.src='imagens/logo.png';} else {this.style.display='none'; document.getElementById('fallback-icon').style.display='flex';}"
+          onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='flex';"
         />
         <div id="fallback-icon" style="display:none;" class="w-9 h-9 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 items-center justify-center text-blue-600 dark:text-blue-400">
           <i class="fa-solid fa-dumbbell text-lg"></i>
@@ -72,7 +71,7 @@
     </div>
   </header>
 
-  <!-- CRONÔMETRO EXPANDIDO COM LINHA UNIFICADA -->
+  <!-- CRONÔMETRO -->
   <div class="max-w-md mx-auto px-4 pt-3">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xl shadow-slate-200/50 dark:shadow-black/40 space-y-3 transition-colors">
       <div class="flex items-center justify-between">
@@ -100,7 +99,7 @@
     </div>
   </div>
 
-  <!-- CONTEÚDO PRINCIPAL -->
+  <!-- CONTEÚDO -->
   <main class="max-w-md mx-auto px-4 pt-4">
 
     <!-- VIEW 1: TREINOS -->
@@ -129,7 +128,7 @@
       <div id="history-list" class="space-y-2"></div>
     </section>
 
-    <!-- VIEW 3: NUTRIÇÃO CALIBRADA -->
+    <!-- VIEW 3: NUTRIÇÃO -->
     <section id="view-nutricao" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
         <div class="flex items-center justify-between">
@@ -189,7 +188,7 @@
         </div>
       </div>
 
-      <!-- OPÇÕES DE PRATOS EM GRAMAS -->
+      <!-- OPÇÕES DE PRATOS -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Pratos & Opções Diárias (Por Peso)</h3>
         <div id="meals-container" class="space-y-2.5"></div>
@@ -216,7 +215,7 @@
         <button onclick="closeModal()" class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="p-2 bg-black flex items-center justify-center min-h-[200px]">
-        <img id="modal-img" src="" class="max-h-[50vh] object-contain rounded-lg" onerror="handleImgError(this)" />
+        <img id="modal-img" src="" class="max-h-[50vh] object-contain rounded-lg" />
       </div>
       <div class="p-3">
         <p id="modal-desc" class="text-xs text-slate-600 dark:text-slate-300"></p>
@@ -242,54 +241,39 @@
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9NkaYvRdVIEbysoYwOG9Xz2DCvM4axyMJj9ozqTMWwDnSBpgJPGRB--wjsWYgvN_k/exec";
 
-    // CATÁLOGO COMPLETO COM CAMINHOS SEGUROS
+    // CATÁLOGO COM OS CAMINHOS EXATOS DA SUA PLANILHA (PASTA 'imagens/' COM 'i' MINÚSCULO)
     const EXERCISES = [
       // PUSH (A)
-      { id: "push-01", cat: "push", name: "Supino Reto com Barra", muscle: "Peitoral Maior, Tríceps", sets: "4 x 6-10", img: "Imagens/Supino.png", desc: "Escápulas travadas no banco. Desça a barra no terço inferior do peito." },
-      { id: "push-02", cat: "push", name: "Desenvolvimento com Halteres", muscle: "Deltoide Anterior e Lateral, Tríceps", sets: "3 x 8-12", img: "Imagens/Desenvolvimento com Halteres.png", desc: "Banco a ~75°. Suba sem bater os halteres no topo." },
-      { id: "push-06", cat: "push", name: "Supino Multi-Press na Máquina", muscle: "Peitoral Maior, Deltoide e Tríceps", sets: "3 x 10-12", img: "Imagens/multi-press.png", desc: "Ajuste a altura do banco para alinhar as pegadas com a linha média do peito." },
-      { id: "push-03", cat: "push", name: "Crucifixo Reto com Halteres", muscle: "Peitoral Maior (Alongamento)", sets: "3 x 10-15", img: "Imagens/Crucifixo.png", desc: "Cotovelos levemente fletidos. Sinta o alongamento da fáscia do peito." },
-      { id: "push-04", cat: "push", name: "Tríceps Corda no Pulley", muscle: "Tríceps Braquial", sets: "3 x 10-15", img: "Imagens/Tríceps.png", desc: "Cotovelos colados ao lado do corpo. Abra a corda na extensão final." },
-      { id: "push-05", cat: "push", name: "Flexão de Braço (Push-up)", muscle: "Peitoral e Core", sets: "3 x Até a Falha", img: "Imagens/flexao.png", desc: "Corpo alinhado em prancha sem deixar o quadril ceder." },
+      { id: "push-01", cat: "push", name: "Supino Reto com Barra", muscle: "Peitoral Maior, Tríceps", sets: "4 x 6-10", img: "imagens/Supino.png", desc: "Escápulas travadas no banco. Desça a barra no terço inferior do peito." },
+      { id: "push-02", cat: "push", name: "Desenvolvimento com Halteres", muscle: "Deltoide Anterior e Lateral, Tríceps", sets: "3 x 8-12", img: "imagens/Desenvolvimento com Halteres.png", desc: "Banco a ~75°. Suba sem bater os halteres no topo." },
+      { id: "push-06", cat: "push", name: "Supino Multi-Press na Máquina", muscle: "Peitoral Maior, Deltoide e Tríceps", sets: "3 x 10-12", img: "imagens/multi-press.png", desc: "Ajuste o banco para a pegada na linha do peito e empurre controlando a descida." },
+      { id: "push-03", cat: "push", name: "Crucifixo Reto com Halteres", muscle: "Peitoral Maior (Alongamento)", sets: "3 x 10-15", img: "imagens/Crucifixo.png", desc: "Cotovelos levemente fletidos. Sinta o alongamento da fáscia do peito." },
+      { id: "push-04", cat: "push", name: "Tríceps Corda no Pulley", muscle: "Tríceps Braquial", sets: "3 x 10-15", img: "imagens/Tríceps.png", desc: "Cotovelos colados ao lado do corpo. Abra a corda na extensão final." },
+      { id: "push-05", cat: "push", name: "Flexão de Braço (Push-up)", muscle: "Peitoral e Core", sets: "3 x Até a Falha", img: "imagens/flexao.png", desc: "Corpo alinhado em prancha sem deixar o quadril ceder." },
       
-      // PULL (B) - LOMBAR PROTEGIDA
-      { id: "pull-01", cat: "pull", name: "Puxada Frontal no Pulley", muscle: "Latíssimo do Dorso, Bíceps", sets: "4 x 6-10", img: "Imagens/puxada.png", desc: "Puxe direcionando cotovelos para baixo e para trás com o peito aberto." },
-      { id: "pull-02", cat: "pull", name: "Remada no Banco Inclinado (Peito Apoiado)", muscle: "Dorsais, Trapézio e Romboides", sets: "4 x 8-12", img: "Imagens/remada-banco.png", desc: "Peito totalmente apoiado no banco a ~30-45°. Puxe os halteres esmagando as escápulas, lombar 100% livre de carga." },
-      { id: "pull-03", cat: "pull", name: "Remada Unilateral (Serrote)", muscle: "Dorsais e Romboides", sets: "3 x 10-12", img: "Imagens/serrote.png", desc: "Apoio estável no banco. Puxe o halter direcionando ao quadril." },
-      { id: "pull-04", cat: "pull", name: "Rosca Direta com Barra", muscle: "Bíceps Braquial", sets: "3 x 10-15", img: "Imagens/rosca.png", desc: "Sem balanço lombar. Controle a fase excêntrica de descida." },
+      // PULL (B)
+      { id: "pull-01", cat: "pull", name: "Puxada Frontal no Pulley", muscle: "Latíssimo do Dorso, Bíceps", sets: "4 x 6-10", img: "imagens/puxada.png", desc: "Puxe direcionando cotovelos para baixo e para trás com o peito aberto." },
+      { id: "pull-02", cat: "pull", name: "Remada no Banco Inclinado (Peito Apoiado)", muscle: "Dorsais, Trapézio e Romboides", sets: "4 x 8-12", img: "imagens/remada-banco.png", desc: "Peito totalmente apoiado no banco a ~30-45°. Puxe os halteres focando em esmagar as escápulas, lombar 100% livre de carga." },
+      { id: "pull-03", cat: "pull", name: "Remada Unilateral (Serrote)", muscle: "Dorsais e Romboides", sets: "3 x 10-12", img: "imagens/serrote.png", desc: "Apoio estável no banco. Puxe o halter direcionando ao quadril." },
+      { id: "pull-04", cat: "pull", name: "Rosca Direta com Barra", muscle: "Bíceps Braquial", sets: "3 x 10-15", img: "imagens/rosca.png", desc: "Sem balanço lombar. Controle a fase excêntrica de descida." },
 
-      // LEGS (C) - PERNAS COMPLETAS
-      { id: "legs-01", cat: "legs", name: "Agachamento Livre (Back Squat)", muscle: "Quadríceps, Glúteos, Core", sets: "4 x 6-10", img: "Imagens/agachamento.png", desc: "Pés na largura dos ombros, joelhos alinhados com a ponta dos pés." },
-      { id: "legs-02", cat: "legs", name: "Levantamento Terra Romeno (RDL)", muscle: "Posteriores de Coxa e Glúteos", sets: "3 x 8-12", img: "Imagens/rdl.png", desc: "Empurre o quadril para trás mantendo os joelhos semiflexionados." },
-      { id: "legs-03", cat: "legs", name: "Leg Horizontal Sentado", muscle: "Quadríceps e Glúteos", sets: "3 x 10-12", img: "Imagens/leg-horizontal.png", desc: "Pés paralelos na plataforma. Empurre com o calcanhar sem travar totalmente os joelhos." },
-      { id: "legs-04", cat: "legs", name: "Cadeira Extensora", muscle: "Quadríceps Isolado", sets: "3 x 12-15", img: "Imagens/extensora.png", desc: "Segure 1 segundo no topo da contração máxima." },
-      { id: "legs-05", cat: "legs", name: "Panturrilha em Pé", muscle: "Gastrocnêmio e Sóleo", sets: "4 x 15-20", img: "Imagens/panturrilha.png", desc: "Alongamento total na descida e contração forte na ponta dos pés." },
-      { id: "legs-06", cat: "legs", name: "Cadeira Adutora / Abdutora Conjugada", muscle: "Glúteo Médio e Adutores", sets: "3 x 12-15", img: "Imagens/adutora-abdutora.png", desc: "Costas bem encostadas; execute movimentos controlados sem soltar as placas bruscamente." },
-      { id: "func-01", cat: "legs", name: "Wall Sit (Agachamento na Parede)", muscle: "Quadríceps Isométrico", sets: "3 x 45-60s", img: "Imagens/wall-sit.png", desc: "Pernas a 90°, tronco bem apoiado na parede." },
+      // LEGS (C)
+      { id: "legs-01", cat: "legs", name: "Agachamento Livre (Back Squat)", muscle: "Quadríceps, Glúteos, Core", sets: "4 x 6-10", img: "imagens/agachamento.png", desc: "Pés na largura dos ombros, joelhos alinhados com a ponta dos pés." },
+      { id: "legs-02", cat: "legs", name: "Levantamento Terra Romeno (RDL)", muscle: "Posteriores de Coxa e Glúteos", sets: "3 x 8-12", img: "imagens/rdl.png", desc: "Empurre o quadril para trás mantendo os joelhos semiflexionados." },
+      { id: "legs-03", cat: "legs", name: "Leg Horizontal Sentado", muscle: "Quadríceps e Glúteos", sets: "3 x 10-12", img: "imagens/leg-horizontal.png", desc: "Pés paralelos na plataforma. Empurre com o calcanhar sem travar totalmente os joelhos." },
+      { id: "legs-04", cat: "legs", name: "Cadeira Extensora", muscle: "Quadríceps Isolado", sets: "3 x 12-15", img: "imagens/extensora.png", desc: "Segure 1 segundo no topo da contração máxima." },
+      { id: "legs-05", cat: "legs", name: "Panturrilha em Pé", muscle: "Gastrocnêmio e Sóleo", sets: "4 x 15-20", img: "imagens/panturrilha.png", desc: "Alongamento total na descida e contração forte na ponta dos pés." },
+      { id: "legs-06", cat: "legs", name: "Cadeira Adutora / Abdutora Conjugada", muscle: "Glúteo Médio e Adutores", sets: "3 x 12-15", img: "imagens/adutora-abdutora.png", desc: "Costas bem encostadas; execute movimentos controlados sem soltar as placas bruscamente." },
+      { id: "func-01", cat: "legs", name: "Wall Sit (Agachamento na Parede)", muscle: "Quadríceps Isométrico", sets: "3 x 45-60s", img: "imagens/wall-sit.png", desc: "Pernas a 90°, tronco bem apoiado na parede." },
 
-      // OUTROS / CORE EXCLUSIVO
-      { id: "core-00", cat: "outros", name: "Abdominal Tradicional no Solo (Crunch)", muscle: "Reto Abdominal", sets: "3 x 15-20", img: "Imagens/crunch.png", desc: "Deitado no colchonete, flexione a coluna enrolando o abdômen sem puxar o pescoço." },
-      { id: "func-03", cat: "outros", name: "Elevação de Pernas (Leg Raise)", muscle: "Abdômen Inferior e Core", sets: "3 x 15-20", img: "Imagens/leg-raise.png", desc: "Lombar colada no chão, suba com controle sem jogar o quadril." },
-      { id: "core-02", cat: "outros", name: "Abdominal Supra na Polia (Cable Crunch)", muscle: "Reto Abdominal (Carga)", sets: "4 x 10-12", img: "Imagens/cable-crunch.png", desc: "Ajoelhe no crossover, segure a corda e enrole o tronco direcionando cotovelos aos joelhos." },
-      { id: "core-03", cat: "outros", name: "Prancha Frontal Isométrica", muscle: "Transverso do Abdômen e Core", sets: "3 x 45-60s", img: "Imagens/prancha.png", desc: "Cotovelos alinhados aos ombros, glúteos e abdômen contraídos sem deixar o quadril cair." },
-      { id: "core-04", cat: "outros", name: "Russian Twist / Oblíquos", muscle: "Oblíquos Internos e Externos", sets: "3 x 15-20", img: "Imagens/russian-twist.png", desc: "Sentado, pés suspensos, gire o tronco segurando um peso de um lado ao outro." },
-      { id: "core-05", cat: "outros", name: "Roda Abdominal (Ab Wheel)", muscle: "Core Total & Anti-Extensão", sets: "3 x 8-12", img: "Imagens/roda-abdominal.png", desc: "Role para frente sem deixar a lombar arquear; volte puxando com a força do abdômen." }
+      // CORE / FUNCIONAL
+      { id: "core-00", cat: "outros", name: "Abdominal Tradicional no Solo (Crunch)", muscle: "Reto Abdominal", sets: "3 x 15-20", img: "imagens/crunch.png", desc: "Deitado de costas, flexione o tronco enrolando o abdômen sem puxar o pescoço." },
+      { id: "func-03", cat: "outros", name: "Elevação de Pernas (Leg Raise)", muscle: "Abdômen e Core", sets: "3 x 15-20", img: "imagens/leg-raise.png", desc: "Lombar colada no chão, suba com controle sem jogar o quadril." },
+      { id: "core-02", cat: "outros", name: "Abdominal Supra na Polia (Cable Crunch)", muscle: "Reto Abdominal (Carga)", sets: "4 x 10-12", img: "imagens/cable-crunch.png", desc: "Flexione a coluna levando a cabeça em direção aos joelhos mantendo o quadril fixo." },
+      { id: "core-03", cat: "outros", name: "Prancha Frontal Isométrica", muscle: "Transverso do Abdômen e Core", sets: "3 x 45-60s", img: "imagens/prancha.png", desc: "Cotovelos alinhados aos ombros, abdômen e glúteos travados em linha reta." },
+      { id: "core-04", cat: "outros", name: "Russian Twist / Oblíquos", muscle: "Oblíquos Internos e Externos", sets: "3 x 15-20", img: "imagens/russian-twist.png", desc: "Tronco inclinado, calcanhares fora do chão, gire controlando a rotação." },
+      { id: "core-05", cat: "outros", name: "Roda Abdominal (Ab Wheel)", muscle: "Core Total & Anti-Extensão", sets: "3 x 8-12", img: "imagens/roda-abdominal.png", desc: "Role para frente sem deixar a lombar arquear; retorne contraindo o core." }
     ];
-
-    // RECUPERADOR INTELIGENTE DE IMAGEM (Alterna entre Imagens/ e imagens/ se houver erro)
-    function handleImgError(img) {
-      if (!img.dataset.hasSwappedCase) {
-        img.dataset.hasSwappedCase = "true";
-        if (img.src.includes("/Imagens/")) {
-          img.src = img.src.replace("/Imagens/", "/imagens/");
-          return;
-        } else if (img.src.includes("/imagens/")) {
-          img.src = img.src.replace("/imagens/", "/Imagens/");
-          return;
-        }
-      }
-      img.src = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&auto=format&fit=crop&q=80";
-    }
 
     let currentCat = "push";
     let logs = JSON.parse(localStorage.getItem("it_logs") || "[]");
@@ -367,7 +351,7 @@
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">${e.muscle}</p>
               </div>
               <button onclick="openModal('${e.id}')" class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden flex-shrink-0 active:scale-95 transition">
-                <img src="${encodeURI(e.img)}" alt="${e.name}" class="w-full h-full object-cover" onerror="handleImgError(this)" />
+                <img src="${e.img}" alt="${e.name}" class="w-full h-full object-cover" />
               </button>
             </div>
 
@@ -605,9 +589,7 @@
       if (!e) return;
       document.getElementById("modal-title").textContent = e.name;
       document.getElementById("modal-desc").textContent = e.desc;
-      const modalImg = document.getElementById("modal-img");
-      delete modalImg.dataset.hasSwappedCase;
-      modalImg.src = encodeURI(e.img);
+      document.getElementById("modal-img").src = e.img;
       document.getElementById("image-modal").classList.remove("hidden");
       document.getElementById("image-modal").classList.add("flex");
     }
